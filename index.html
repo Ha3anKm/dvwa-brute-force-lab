@@ -175,15 +175,31 @@
         box-shadow: 0 0 0 4px var(--green-soft);
       }
       .toc {
+        flex: 1 1 auto;
+        min-width: 0;
         display: flex;
         align-items: center;
         gap: 6px;
         overflow-x: auto;
-        scrollbar-width: none;
-        padding-block: 2px;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px 2px 7px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--green) var(--bg-subtle);
       }
       .toc::-webkit-scrollbar {
-        display: none;
+        height: 6px;
+      }
+      .toc::-webkit-scrollbar-track {
+        background: var(--bg-subtle);
+        border-radius: 999px;
+      }
+      .toc::-webkit-scrollbar-thumb {
+        background: var(--green);
+        border-radius: 999px;
+      }
+      .toc::-webkit-scrollbar-thumb:hover {
+        background: var(--green-dark);
       }
       .toc a {
         flex: 0 0 auto;
@@ -223,6 +239,8 @@
         color: var(--ink);
         font-size: 0.82rem;
         font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -511,6 +529,55 @@
         cursor: pointer;
         touch-action: manipulation;
       }
+      .levels .cardish:hover,
+      .levels .cardish.open {
+        border-color: var(--green);
+        box-shadow: var(--shadow-sm);
+      }
+      .level-cue {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 10px;
+        background: var(--green-soft);
+        border: 1px solid rgba(13, 110, 82, 0.24);
+        color: var(--green);
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition:
+          background-color 0.18s ease,
+          color 0.18s ease,
+          border-color 0.18s ease;
+      }
+      .levels .cardish:hover .level-cue {
+        background: var(--green);
+        color: #ffffff;
+        border-color: var(--green);
+      }
+      [data-theme="dark"] .levels .cardish:hover .level-cue {
+        color: #051c15;
+      }
+      .level-cue .chev {
+        display: inline-block;
+        transition: transform 0.25s ease;
+        font-size: 0.9em;
+      }
+      .levels .cardish.open .level-cue {
+        background: var(--bg-subtle);
+        color: var(--muted);
+        border-color: var(--line);
+      }
+      .levels .cardish.open:hover .level-cue,
+      [data-theme="dark"] .levels .cardish.open:hover .level-cue {
+        background: var(--green-soft);
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .levels .cardish.open .level-cue .chev {
+        transform: rotate(180deg);
+      }
       .levels .cardish p {
         max-height: 0;
         opacity: 0;
@@ -523,24 +590,9 @@
           margin-top 0.22s ease;
       }
       .levels .cardish.open p {
-        max-height: 320px;
+        max-height: 360px;
         opacity: 1;
         margin-top: 0;
-      }
-      .levels .cardish h3 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-      }
-      .levels .cardish h3::after {
-        content: "▾";
-        font-size: 0.9em;
-        color: var(--green);
-        transition: transform 0.25s ease;
-      }
-      .levels .cardish.open h3::after {
-        transform: rotate(180deg);
       }
       .grid-2 {
         display: grid;
@@ -1019,6 +1071,10 @@
         margin: 12px 0 0;
         padding-bottom: 4px;
       }
+      .spec-drawer[hidden],
+      .spec-more-wrap[hidden] {
+        display: none;
+      }
       .spec-more-wrap {
         display: flex;
         justify-content: center;
@@ -1124,19 +1180,25 @@
         padding: 16px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 13px;
       }
       .ctrl-title {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 8px;
-        font-size: 0.84rem;
+        font-size: 0.85rem;
         font-weight: 800;
         color: var(--ink);
-        padding-bottom: 9px;
+        padding-bottom: 10px;
         border-bottom: 1px dashed var(--line);
       }
-      .ctrl-title::before {
+      .ctrl-title-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .ctrl-title-main::before {
         content: "";
         width: 8px;
         height: 8px;
@@ -1144,6 +1206,11 @@
         background: var(--green);
         box-shadow: 0 0 0 3px var(--green-soft);
         flex-shrink: 0;
+      }
+      .ctrl-sub {
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: var(--muted);
       }
       .ctrl-vals:not(:has(.val.show)) {
         display: none;
@@ -1157,7 +1224,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        font-size: 0.82rem;
+        font-size: 0.81rem;
         font-weight: 700;
         color: var(--muted);
       }
@@ -1198,12 +1265,57 @@
         outline: 2px solid var(--green);
         outline-offset: 2px;
       }
+      .seg-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .seg-label {
+        font-size: 0.81rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .seg-btns {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        padding: 4px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        direction: ltr;
+      }
+      .seg-btn {
+        min-height: 36px;
+        padding: 0 8px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.77rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.16s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .seg-btn:hover {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+      .seg-btn[aria-pressed="true"] {
+        background: var(--green);
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(13, 110, 82, 0.25);
+      }
       .ctrl-switches .group {
         display: grid;
         grid-template-columns: 74px minmax(0, 1fr);
         align-items: start;
         gap: 10px;
-        padding-top: 10px;
+        padding-top: 11px;
         border-top: 1px dashed var(--line);
       }
       .ctrl-switches .group:first-of-type {
@@ -1216,7 +1328,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.8rem;
+        font-size: 0.79rem;
         font-weight: 800;
         color: var(--muted);
         background: var(--bg-subtle);
@@ -1231,14 +1343,14 @@
       }
       .chip {
         min-height: 36px;
-        min-width: 48px;
+        min-width: 46px;
         padding: 0 11px;
         border-radius: 9px;
         border: 1px solid var(--line-strong);
         background: var(--card);
         color: var(--ink);
         font-family: var(--mono);
-        font-size: 0.82rem;
+        font-size: 0.81rem;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.15s ease;
@@ -1281,7 +1393,7 @@
         border-color: var(--green);
         box-shadow: 0 0 0 3px var(--green-soft);
       }
-      .val span {
+      .val-k {
         flex: 0 0 auto;
         min-width: 54px;
         padding: 0 11px;
@@ -1291,10 +1403,11 @@
         background: var(--green-soft);
         border-right: 1px solid var(--line);
         font-family: var(--mono);
-        font-size: 0.82rem;
+        font-size: 0.81rem;
         font-weight: 800;
         color: var(--green);
         white-space: nowrap;
+        cursor: pointer;
       }
       .val input {
         flex: 1 1 auto;
@@ -1302,7 +1415,7 @@
         border-radius: 0;
         background: transparent;
         min-height: 38px;
-        padding: 7px 11px;
+        padding: 7px 10px;
         font-family: var(--mono);
         font-size: 0.83rem;
       }
@@ -1310,12 +1423,40 @@
         outline: none;
         box-shadow: none;
       }
+      .val-x {
+        flex: 0 0 auto;
+        width: 34px;
+        border: 0;
+        border-left: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .val-x:hover {
+        background: var(--copper-soft);
+        color: var(--copper);
+      }
+      #h-lab-ck,
+      #h-lab-fF,
+      #h-lab-fS,
       #w-lab-b,
       #w-lab-d,
-      #w-lab-H {
+      #w-lab-H,
+      #w-lab-flt {
         grid-column: 1 / -1;
       }
-      @media (max-width: 600px) {
+      @media (max-width: 640px) {
+        .seg-btns {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
         .ctrl-switches .group {
           grid-template-columns: 1fr;
           gap: 7px;
@@ -1339,24 +1480,6 @@
         padding: 3px 8px;
         border-radius: 6px;
         background: var(--term);
-      }
-
-      /* Command Showcase Cards */
-      .cmd-card {
-        background: var(--card-soft);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .cmd-card h3 {
-        margin: 0;
-      }
-      .cmd-card p {
-        font-size: 0.93rem;
-        color: var(--muted);
       }
 
       footer.foot {
@@ -1710,11 +1833,11 @@
         .order-note {
           grid-template-columns: 1fr;
         }
-        .brand-pill span {
-          display: none;
-        }
         .wl-preview {
           grid-template-columns: 1fr;
+        }
+        .brand-pill span {
+          display: none;
         }
       }
       @media (max-width: 600px) {
@@ -1729,15 +1852,20 @@
         select {
           font-size: 16px;
         }
-      }
-      @media (max-width: 480px) {
         .topbar-inner {
-          flex-wrap: wrap;
-          row-gap: 6px;
+          gap: 8px;
         }
-        .toc {
-          order: 3;
-          flex: 1 0 100%;
+        .brand-pill {
+          display: none;
+        }
+        .icon-btn {
+          height: 34px;
+          padding: 0 10px;
+          font-size: 0.77rem;
+        }
+        .toc a {
+          padding: 6px 11px;
+          font-size: 0.8rem;
         }
       }
       @media (prefers-reduced-motion: reduce) {
@@ -1751,7 +1879,6 @@
       .builder-controls,
       .builder-output,
       .grid-2 > *,
-      .cmd-card,
       .term,
       .fields,
       .vals,
@@ -1770,6 +1897,7 @@
       [data-theme="dark"] .btn.light:hover,
       [data-theme="dark"] .toc a.active,
       [data-theme="dark"] .chip[aria-pressed="true"],
+      [data-theme="dark"] .seg-btn[aria-pressed="true"],
       [data-theme="dark"] .presets .btn.is-on,
       [data-theme="dark"] .presets .btn.light.is-on,
       [data-theme="dark"] .presets .btn.is-on:hover,
@@ -3486,7 +3614,9 @@
             <p class="spec-note">
               <bdi class="lx">-w</bdi> مهلت انتظار پاسخ (پیش‌فرض ۳۲ ثانیه)،
               <bdi class="lx">-W</bdi> مکث بین اتصال‌های یک تسک و
-              <bdi class="lx">-c</bdi> مکث سراسری هر تلاش است.
+              <bdi class="lx">-c</bdi> مکث سراسری هر تلاش است؛ فعال کردن
+              <bdi class="lx">-c</bdi> در Hydra به‌طور خودکار هم‌زمانی را روی
+              <bdi class="lx">-t 1</bdi> محدود می‌کند.
             </p>
           </article>
           <article>
@@ -3513,7 +3643,8 @@
             </div>
             <p class="spec-main">خاموش کردن خطای اتصال، یا حالت اشکال‌زدایی</p>
             <p class="spec-note">
-              <bdi class="lx">-q</bdi> خطاهای اتصال را چاپ نمی‌کند.
+              <bdi class="lx">-q</bdi> برخی پیام‌های خطای اتصال را کم می‌کند
+              (خطای قطع کامل تسک‌ها روی پورت بسته همچنان چاپ می‌شود).
               <bdi class="lx">-d</bdi> جزئیات debug را به خروجی اضافه می‌کند.
             </p>
           </article>
@@ -3783,7 +3914,9 @@
             <p class="spec-main">هم‌زمانی و مکث بین درخواست‌ها</p>
             <p class="spec-note">
               <bdi class="lx">-t</bdi> تعداد اتصال هم‌زمان است (پیش‌فرض ۱۰) و
-              <bdi class="lx">-s</bdi> تأخیر بین درخواست‌ها بر حسب ثانیه.
+              <bdi class="lx">-s</bdi> تأخیر بین درخواست‌ها بر حسب ثانیه. اگر
+              <bdi class="lx">-s</bdi> بزرگ‌تر از صفر باشد، Wfuzz هم‌زمانی را به
+              ۱ محدود کرده و <bdi class="lx">-t</bdi> را نادیده می‌گیرد.
             </p>
           </article>
           <article>
@@ -3800,7 +3933,9 @@
             <p class="spec-main">شیوه ترکیب چند payload</p>
             <p class="spec-note">
               پیش‌فرض <bdi class="lx">product</bdi> است (همه ترکیب‌ها).
-              <bdi class="lx">zip</bdi> خط‌ها را جفت‌جفت جلو می‌برد.
+              <bdi class="lx">zip</bdi> خط‌ها را جفت‌جفت جلو می‌برد و
+              <bdi class="lx">chain</bdi> دو فهرست را پشت‌سرهم به یک جریان واحد
+              می‌چسباند.
             </p>
           </article>
           <article>
@@ -3838,7 +3973,10 @@
             </div>
             <p class="spec-main">نشان دادن فقط پاسخ‌های منطبق</p>
             <p class="spec-note">
-              اگر چند فیلتر show با هم روشن باشند، پاسخ باید همه را داشته باشد.
+              در Wfuzz 3.1.0 فیلترهای عددی show با هم منطق OR دارند (داشتن یکی
+              از شرط‌ها کافی است)؛ برای ترکیب با متن می‌توان آن‌ها را کنار
+              <bdi class="lx">--ss</bdi> یا
+              <bdi class="lx">--filter</bdi> استفاده کرد.
             </p>
           </article>
           <article>
@@ -3851,12 +3989,12 @@
             <p class="spec-note">
               <bdi class="lx">--hs</bdi> عبارت را حذف می‌کند و
               <bdi class="lx">--ss</bdi> فقط همان عبارت را نگه می‌دارد (با عبارت
-              منظم). در Wfuzz فیلترهای عددی <bdi class="lx">hide</bdi> و
-              <bdi class="lx">show</bdi> با هم، و همچنین
-              <bdi class="lx">--hs</bdi> و <bdi class="lx">--ss</bdi> با هم قابل
-              ترکیب نیستند؛ اما ترکیب یک فیلتر عددی با فیلتر متنی (مثل
-              <bdi class="lx">--hw 258</bdi> و
-              <bdi class="lx">--ss "Welcome"</bdi>) مجاز است.
+              منظم). در Wfuzz 3.1.0 نمی‌توان <bdi class="lx">--hs</bdi> و
+              <bdi class="lx">--ss</bdi> را هم‌زمان به کار برد، اما ترکیب فیلتر
+              عددی با متنی (مثل <bdi class="lx">--hw 258</bdi> و
+              <bdi class="lx">--ss "Welcome"</bdi>) یا ترکیب hide و show عددی
+              (مثل <bdi class="lx">--hw 258</bdi> و
+              <bdi class="lx">--sw 262</bdi>) مجاز است.
             </p>
           </article>
           <article>
@@ -4871,6 +5009,21 @@
           }
           return v;
         }
+        function alwaysQuote(v) {
+          v = String(v);
+          if (v.indexOf("!") >= 0) {
+            return "'" + v.replace(/'/g, "'\\''") + "'";
+          }
+          return (
+            '"' +
+            v
+              .replace(/\\/g, "\\\\")
+              .replace(/"/g, '\\"')
+              .replace(/\$/g, "\\$")
+              .replace(/`/g, "\\`") +
+            '"'
+          );
+        }
 
         /* ================= HYDRA BUILDER ================= */
         var CREDS = {
@@ -4889,49 +5042,186 @@
         };
 
         var HY = [
-          { k: "l", f: "-l", g: "هویت", val: "admin", hint: "یک نام کاربری" },
+          {
+            k: "ck",
+            f: "H=Cookie",
+            g: "فرم",
+            val: "PHPSESSID=f152050718ca0bd419db3ca17afe3e2d; security=low",
+            hint: "کوکی نشست (در صورت نیاز سایت)",
+          },
+          {
+            k: "fF",
+            f: "F=",
+            g: "فرم",
+            val: "Username and/or password incorrect.",
+            hint: "متن شرط شکست در پاسخ سرور",
+          },
+          {
+            k: "fS",
+            f: "S=",
+            g: "فرم",
+            val: "Welcome",
+            hint: "متن شرط موفقیت در پاسخ سرور",
+          },
+          {
+            k: "l",
+            f: "-l",
+            g: "هویت",
+            val: "admin",
+            hint: "یک نام کاربری ثابت",
+          },
           {
             k: "L",
             f: "-L",
             g: "هویت",
             val: "userlist.txt",
-            hint: "فایل کاربر",
+            hint: "فایل نام کاربری‌ها",
           },
-          { k: "p", f: "-p", g: "هویت", val: "password", hint: "یک رمز" },
-          { k: "P", f: "-P", g: "هویت", val: "passlist.txt", hint: "فایل رمز" },
+          {
+            k: "p",
+            f: "-p",
+            g: "هویت",
+            val: "password",
+            hint: "یک رمز عبور ثابت",
+          },
+          {
+            k: "P",
+            f: "-P",
+            g: "هویت",
+            val: "passlist.txt",
+            hint: "فایل رمزها",
+          },
           {
             k: "C",
             f: "-C",
             g: "هویت",
             val: "pairs.txt",
-            hint: "فایل user:pass",
+            hint: "فایل جفت‌های user:pass",
           },
-          { k: "e", f: "-e", g: "هویت", val: "ns", hint: "n یا s یا r" },
-          { k: "x", f: "-x", g: "هویت", val: "4:6:a1", hint: "ساخت رمز" },
-          { k: "y", f: "-y", g: "هویت" },
-          { k: "u", f: "-u", g: "هویت" },
-          { k: "s", f: "-s", g: "اتصال", val: "42001", hint: "پورت" },
-          { k: "S", f: "-S", g: "اتصال" },
-          { k: "t", f: "-t", g: "اتصال", val: "16", hint: "هم‌زمانی" },
-          { k: "T", f: "-T", g: "اتصال", val: "16", hint: "سقف کل تسک" },
-          { k: "w", f: "-w", g: "اتصال", val: "32", hint: "انتظار پاسخ" },
-          { k: "W", f: "-W", g: "اتصال", val: "1", hint: "مکث بین اتصال" },
-          { k: "cw", f: "-c", g: "اتصال", val: "1", hint: "مکث هر تلاش" },
-          { k: "M", f: "-M", g: "اتصال", val: "targets.txt", hint: "چند هدف" },
-          { k: "V", f: "-V", g: "خروجی" },
-          { k: "v", f: "-v", g: "خروجی" },
-          { k: "I", f: "-I", g: "خروجی" },
-          { k: "R", f: "-R", g: "خروجی" },
-          { k: "f", f: "-f", g: "خروجی" },
-          { k: "F", f: "-F", g: "خروجی" },
-          { k: "o", f: "-o", g: "خروجی", val: "found.txt", hint: "فایل نتیجه" },
-          { k: "b", f: "-b", g: "خروجی", val: "text", hint: "قالب خروجی" },
-          { k: "q", f: "-q", g: "خروجی" },
-          { k: "d", f: "-d", g: "خروجی" },
+          {
+            k: "e",
+            f: "-e",
+            g: "هویت",
+            val: "ns",
+            hint: "تست اضافه: n خالی، s هم‌نام، r وارونه",
+          },
+          {
+            k: "x",
+            f: "-x",
+            g: "هویت",
+            val: "4:6:a1",
+            hint: "تولید رمز با الگوی min:max:charset",
+          },
+          {
+            k: "y",
+            f: "-y",
+            g: "هویت",
+            hint: "غیرفعال کردن نمادهای a/A/1 در -x",
+          },
+          {
+            k: "u",
+            f: "-u",
+            g: "هویت",
+            hint: "چرخاندن حلقه روی رمز به‌جای کاربر",
+          },
+          {
+            k: "s",
+            f: "-s",
+            g: "اتصال",
+            val: "42001",
+            hint: "شماره پورت غیراستاندارد",
+          },
+          { k: "S", f: "-S", g: "اتصال", hint: "اتصال با SSL" },
+          {
+            k: "t",
+            f: "-t",
+            g: "اتصال",
+            val: "16",
+            hint: "تعداد اتصال هم‌زمان",
+          },
+          { k: "T", f: "-T", g: "اتصال", val: "16", hint: "سقف کل تسک‌ها" },
+          {
+            k: "w",
+            f: "-w",
+            g: "اتصال",
+            val: "32",
+            hint: "مهلت انتظار پاسخ (ثانیه)",
+          },
+          {
+            k: "W",
+            f: "-W",
+            g: "اتصال",
+            val: "1",
+            hint: "مکث بین اتصال‌ها (ثانیه)",
+          },
+          {
+            k: "cw",
+            f: "-c",
+            g: "اتصال",
+            val: "1",
+            hint: "مکث سراسری هر تلاش (ثانیه)",
+          },
+          {
+            k: "M",
+            f: "-M",
+            g: "اتصال",
+            val: "targets.txt",
+            hint: "فایل چند هدف",
+          },
+          { k: "V", f: "-V", g: "خروجی", hint: "نمایش تک‌تک تلاش‌ها" },
+          { k: "v", f: "-v", g: "خروجی", hint: "گزارش مفصل‌تر" },
+          {
+            k: "I",
+            f: "-I",
+            g: "خروجی",
+            hint: "نادیده گرفتن فایل hydra.restore",
+          },
+          {
+            k: "R",
+            f: "-R",
+            g: "خروجی",
+            hint: "ادامه جلسه قبلی از hydra.restore",
+          },
+          {
+            k: "f",
+            f: "-f",
+            g: "خروجی",
+            hint: "توقف پس از اولین رمز درست روی هدف",
+          },
+          {
+            k: "F",
+            f: "-F",
+            g: "خروجی",
+            hint: "توقف کل حمله پس از اولین رمز درست",
+          },
+          {
+            k: "o",
+            f: "-o",
+            g: "خروجی",
+            val: "found.txt",
+            hint: "ذخیره نتیجه در فایل",
+          },
+          {
+            k: "b",
+            f: "-b",
+            g: "خروجی",
+            val: "text",
+            hint: "قالب فایل خروجی (text / json / jsonv1)",
+          },
+          { k: "q", f: "-q", g: "خروجی", hint: "مخفی کردن خطای اتصال" },
+          { k: "d", f: "-d", g: "خروجی", hint: "حالت اشکال‌زدایی (Debug)" },
         ];
 
         function mountHydra() {
           var root = document.getElementById("hydra-app");
+          var MODS = [
+            "http-get-form",
+            "http-post-form",
+            "https-get-form",
+            "https-post-form",
+          ];
+          var activeMod = "http-get-form";
+
           var groups = {};
           HY.forEach(function (sw) {
             (groups[sw.g] = groups[sw.g] || []).push(sw);
@@ -4945,7 +5235,9 @@
                 sw.k +
                 '" data-k="' +
                 sw.k +
-                '" aria-pressed="false" dir="ltr">' +
+                '" aria-pressed="false" dir="ltr" title="' +
+                esc(sw.hint || sw.f) +
+                '">' +
                 sw.f +
                 "</button>";
             });
@@ -4956,51 +5248,81 @@
           })
             .map(function (sw) {
               return (
-                '<label class="val" id="h-lab-' +
+                '<div class="val" id="h-lab-' +
                 sw.k +
-                '"><span dir="ltr">' +
+                '">' +
+                '<label class="val-k" for="h-val-' +
+                sw.k +
+                '" dir="ltr" title="' +
+                esc(sw.hint || sw.f) +
+                '">' +
                 sw.f +
-                '</span><input id="h-val-' +
+                "</label>" +
+                '<input id="h-val-' +
                 sw.k +
                 '" dir="ltr" value="' +
                 esc(sw.val) +
+                '" placeholder="' +
+                esc(sw.hint || "") +
                 '" aria-label="' +
-                esc(sw.hint) +
-                '"></label>'
+                esc(sw.hint || sw.f) +
+                '">' +
+                '<button type="button" class="val-x" data-k="' +
+                sw.k +
+                '" title="خاموش کردن ' +
+                esc(sw.f) +
+                '" aria-label="خاموش کردن ' +
+                esc(sw.f) +
+                '">×</button>' +
+                "</div>"
               );
             })
             .join("");
+          var modBtns = MODS.map(function (m) {
+            return (
+              '<button type="button" class="seg-btn" data-mod="' +
+              m +
+              '" aria-pressed="' +
+              (m === activeMod ? "true" : "false") +
+              '">' +
+              m +
+              "</button>"
+            );
+          }).join("");
 
           root.innerHTML =
             '<div class="builder-split">' +
             '<div class="builder-controls">' +
             '<div class="presets">' +
-            '<button type="button" class="btn light sm" id="h-p1" data-preset="1">نمونه ۱ — تست کاربر و رمز</button>' +
-            '<button type="button" class="btn light sm" id="h-p2" data-preset="2">نمونه ۲ — تست رمز برای admin</button>' +
+            '<button type="button" class="btn light sm" id="h-p1" data-preset="1">نمونه ۱ — تست کاربر و رمز (DVWA)</button>' +
+            '<button type="button" class="btn light sm" id="h-p2" data-preset="2">نمونه ۲ — تست رمز برای admin (DVWA)</button>' +
+            '<button type="button" class="btn light sm" id="h-p3" data-preset="3">نمونه ۳ — سایت عمومی (POST بدون کوکی)</button>' +
             '<button type="button" class="btn outline sm" data-dl="user">دانلود userlist.txt</button>' +
             '<button type="button" class="btn outline sm" data-dl="pass">دانلود passlist.txt</button>' +
             "</div>" +
             '<div class="ctrl-card">' +
-            '<div class="ctrl-title">تنظیمات پایه هدف و فرم</div>' +
+            '<div class="ctrl-title"><span class="ctrl-title-main">هدف و ساختار فرم</span></div>' +
+            '<div class="seg-wrap">' +
+            '<span class="seg-label">ماژول سرویس وب</span>' +
+            '<div class="seg-btns" role="group" aria-label="انتخاب ماژول">' +
+            modBtns +
+            "</div>" +
+            "</div>" +
             '<div class="fields">' +
-            '<label class="field">IP هدف<input id="h-ip" dir="ltr" value="127.0.0.1"></label>' +
-            '<label class="field">ماژول<select id="h-mod" dir="ltr"><option>http-get-form</option><option>http-post-form</option><option>https-get-form</option><option>https-post-form</option></select></label>' +
+            '<label class="field">IP یا دامنه هدف<input id="h-ip" dir="ltr" value="127.0.0.1"></label>' +
             '<label class="field">مسیر فرم<input id="h-path" dir="ltr" value="/vulnerabilities/brute/"></label>' +
-            '<label class="field">Session ID<input id="h-session" dir="ltr" value="f152050718ca0bd419db3ca17afe3e2d"></label>' +
-            '<label class="field">سطح امنیتی<select id="h-level" dir="ltr"><option>low</option><option>medium</option><option>high</option><option>impossible</option></select></label>' +
-            '<label class="field">متن شرط شکست<input id="h-fail" dir="ltr" value="Username and/or password incorrect."></label>' +
             "</div>" +
             '<label class="field">متغیرهای فرم<input id="h-vars" dir="ltr" value="username=^USER^&password=^PASS^&Login=Login"></label>' +
             "</div>" +
-            '<div class="ctrl-card ctrl-switches">' +
-            '<div class="ctrl-title">انتخاب سوییچ‌ها</div>' +
-            chips +
-            "</div>" +
             '<div class="ctrl-card ctrl-vals">' +
-            '<div class="ctrl-title">مقادیر سوییچ‌های فعال</div>' +
+            '<div class="ctrl-title"><span class="ctrl-title-main">مقادیر سوییچ‌های فعال</span><span class="ctrl-sub">ویرایش مستقیم یا حذف با ×</span></div>' +
             '<div class="vals">' +
             vals +
             "</div>" +
+            "</div>" +
+            '<div class="ctrl-card ctrl-switches">' +
+            '<div class="ctrl-title"><span class="ctrl-title-main">سوییچ‌ها و اجزای فرم</span><span class="ctrl-sub">کلیک برای روشن یا خاموش کردن</span></div>' +
+            chips +
             "</div>" +
             "</div>" +
             '<div class="builder-output">' +
@@ -5016,58 +5338,94 @@
 
           bindCopy(root);
           bindZoom(root);
-          root.querySelectorAll(".chip").forEach(function (b) {
+
+          function setMod(m) {
+            activeMod = m;
+            root.querySelectorAll(".seg-btn").forEach(function (b) {
+              b.setAttribute(
+                "aria-pressed",
+                b.dataset.mod === m ? "true" : "false",
+              );
+            });
+          }
+          function setChip(k, on) {
+            var btn = document.getElementById("h-sw-" + k);
+            if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+            var lab = document.getElementById("h-lab-" + k);
+            if (lab) lab.classList.toggle("show", on);
+          }
+
+          root.querySelectorAll(".seg-btn").forEach(function (b) {
             b.addEventListener("click", function () {
-              var on = b.getAttribute("aria-pressed") !== "true";
-              b.setAttribute("aria-pressed", on ? "true" : "false");
-              var lab = document.getElementById("h-lab-" + b.dataset.k);
-              if (lab) lab.classList.toggle("show", on);
+              setMod(b.dataset.mod);
               refresh();
             });
           });
-          root.querySelectorAll("input, select").forEach(function (el) {
+          root.querySelectorAll(".chip").forEach(function (b) {
+            b.addEventListener("click", function () {
+              var on = b.getAttribute("aria-pressed") !== "true";
+              setChip(b.dataset.k, on);
+              if (on && b.dataset.k === "fF") setChip("fS", false);
+              if (on && b.dataset.k === "fS") setChip("fF", false);
+              refresh();
+            });
+          });
+          root.querySelectorAll(".val-x").forEach(function (x) {
+            x.addEventListener("click", function () {
+              setChip(x.dataset.k, false);
+              refresh();
+            });
+          });
+          root.querySelectorAll("input").forEach(function (el) {
             el.addEventListener("input", refresh);
             el.addEventListener("change", refresh);
           });
-          function resetBaseFields() {
+
+          function resetDvwaBase() {
             document.getElementById("h-ip").value = "127.0.0.1";
-            document.getElementById("h-mod").value = "http-get-form";
+            setMod("http-get-form");
             document.getElementById("h-path").value = "/vulnerabilities/brute/";
             document.getElementById("h-vars").value =
               "username=^USER^&password=^PASS^&Login=Login";
-            var sEl = document.getElementById("h-session");
-            if (!sEl.value.trim())
-              sEl.value = "f152050718ca0bd419db3ca17afe3e2d";
-            document.getElementById("h-level").value = "low";
-            document.getElementById("h-fail").value =
+            document.getElementById("h-val-ck").value =
+              "PHPSESSID=f152050718ca0bd419db3ca17afe3e2d; security=low";
+            document.getElementById("h-val-fF").value =
               "Username and/or password incorrect.";
+            document.getElementById("h-val-s").value = "42001";
           }
           document
             .getElementById("h-p1")
             .addEventListener("click", function () {
-              resetBaseFields();
+              resetDvwaBase();
               document.getElementById("h-val-L").value = "userlist.txt";
               document.getElementById("h-val-P").value = "passlist.txt";
-              document.getElementById("h-val-s").value = "42001";
-              applyH({ L: 1, P: 1, V: 1, I: 1, s: 1 });
+              applyH({ ck: 1, fF: 1, L: 1, P: 1, V: 1, I: 1, s: 1 });
             });
           document
             .getElementById("h-p2")
             .addEventListener("click", function () {
-              resetBaseFields();
+              resetDvwaBase();
               document.getElementById("h-val-l").value = "admin";
               document.getElementById("h-val-P").value = "passlist.txt";
-              document.getElementById("h-val-s").value = "42001";
-              applyH({ l: 1, P: 1, V: 1, I: 1, s: 1 });
+              applyH({ ck: 1, fF: 1, l: 1, P: 1, V: 1, I: 1, s: 1 });
             });
-          applyH({ L: 1, P: 1, V: 1, I: 1, s: 1 });
+          document
+            .getElementById("h-p3")
+            .addEventListener("click", function () {
+              document.getElementById("h-ip").value = "lab.local";
+              setMod("http-post-form");
+              document.getElementById("h-path").value = "/login";
+              document.getElementById("h-vars").value =
+                "username=^USER^&password=^PASS^";
+              document.getElementById("h-val-fS").value = "Welcome";
+              document.getElementById("h-val-l").value = "admin";
+              document.getElementById("h-val-P").value = "passlist.txt";
+              applyH({ fS: 1, l: 1, P: 1, V: 1, I: 1 });
+            });
 
           function applyH(map) {
             root.querySelectorAll(".chip").forEach(function (b) {
-              var on = !!map[b.dataset.k];
-              b.setAttribute("aria-pressed", on ? "true" : "false");
-              var lab = document.getElementById("h-lab-" + b.dataset.k);
-              if (lab) lab.classList.toggle("show", on);
+              setChip(b.dataset.k, !!map[b.dataset.k]);
             });
             refresh();
           }
@@ -5086,12 +5444,9 @@
               on: on,
               val: val,
               ip: document.getElementById("h-ip").value.trim() || "127.0.0.1",
-              mod: document.getElementById("h-mod").value,
+              mod: activeMod,
               path: document.getElementById("h-path").value.trim() || "/",
               vars: document.getElementById("h-vars").value.trim(),
-              session: document.getElementById("h-session").value.trim(),
-              level: document.getElementById("h-level").value,
-              fail: document.getElementById("h-fail").value,
             };
           }
           function escColon(v) {
@@ -5104,30 +5459,18 @@
             var order = st.on.R
               ? [
                   "R",
-                  "l",
-                  "L",
-                  "p",
-                  "P",
-                  "C",
-                  "e",
-                  "x",
-                  "y",
-                  "u",
-                  "V",
                   "I",
+                  "V",
                   "v",
                   "f",
                   "F",
                   "q",
                   "d",
-                  "S",
-                  "s",
                   "t",
                   "T",
                   "w",
                   "W",
                   "cw",
-                  "M",
                   "o",
                   "b",
                 ]
@@ -5171,23 +5514,29 @@
                 parts.push(quote(st.val[k] == null ? "" : st.val[k]));
             });
             if (st.on.R) return parts.join(" ");
-            var safePath = escColon(st.path);
-            var safeVars = escColon(st.vars);
-            var safeSess = escColon(st.session);
-            var safeFail = escColon(st.fail);
-            var cookie =
-              "H=Cookie\\: PHPSESSID=" + safeSess + "; security=" + st.level;
-            var form =
-              safePath + ":" + safeVars + ":" + cookie + ":F=" + safeFail;
+            var formParts = [escColon(st.path), escColon(st.vars)];
+            if (st.on.ck && String(st.val.ck || "").trim()) {
+              formParts.push(
+                "H=Cookie\\: " + escColon(String(st.val.ck).trim()),
+              );
+            }
+            if (st.on.fS) {
+              formParts.push("S=" + escColon(st.val.fS));
+            } else if (st.on.fF) {
+              formParts.push("F=" + escColon(st.val.fF));
+            }
+            var form = formParts.join(":");
             var quotedForm =
               form.indexOf("!") >= 0
                 ? "'" + form.replace(/'/g, "'\\''") + "'"
                 : '"' +
-                  form
-                    .replace(/(["$`])/g, "\\$1")
-                    .replace(/(\\+)$/, function (m) {
-                      return m.length % 2 ? m + "\\" : m;
-                    }) +
+                  form.replace(
+                    /\\+(?=["$`]|$)|\\{2,}|(["$`])/g,
+                    function (m, ch) {
+                      if (ch) return "\\" + ch;
+                      return m.replace(/\\/g, "\\\\");
+                    },
+                  ) +
                   '"';
             if (!st.on.M) parts.push(quote(st.ip));
             parts.push(st.mod, quotedForm);
@@ -5206,28 +5555,39 @@
           }
           function detectPreset(st) {
             if (
-              st.ip !== "127.0.0.1" ||
-              st.mod !== "http-get-form" ||
-              st.level !== "low" ||
-              st.path !== "/vulnerabilities/brute/" ||
-              st.vars !== "username=^USER^&password=^PASS^&Login=Login" ||
-              st.fail !== "Username and/or password incorrect."
-            )
-              return "";
+              st.ip === "127.0.0.1" &&
+              st.mod === "http-get-form" &&
+              st.path === "/vulnerabilities/brute/" &&
+              st.vars === "username=^USER^&password=^PASS^&Login=Login" &&
+              st.val.fF === "Username and/or password incorrect." &&
+              /security\s*=\s*low\b/i.test(String(st.val.ck || ""))
+            ) {
+              if (
+                keysOn(st, ["ck", "fF", "L", "P", "V", "I", "s"]) &&
+                st.val.L === "userlist.txt" &&
+                st.val.P === "passlist.txt" &&
+                String(st.val.s) === "42001"
+              )
+                return "1";
+              if (
+                keysOn(st, ["ck", "fF", "l", "P", "V", "I", "s"]) &&
+                st.val.l === "admin" &&
+                st.val.P === "passlist.txt" &&
+                String(st.val.s) === "42001"
+              )
+                return "2";
+            }
             if (
-              keysOn(st, ["L", "P", "V", "I", "s"]) &&
-              st.val.L === "userlist.txt" &&
-              st.val.P === "passlist.txt" &&
-              String(st.val.s) === "42001"
-            )
-              return "1";
-            if (
-              keysOn(st, ["l", "P", "V", "I", "s"]) &&
+              st.ip === "lab.local" &&
+              st.mod === "http-post-form" &&
+              st.path === "/login" &&
+              st.vars === "username=^USER^&password=^PASS^" &&
+              st.val.fS === "Welcome" &&
+              keysOn(st, ["fS", "l", "P", "V", "I"]) &&
               st.val.l === "admin" &&
-              st.val.P === "passlist.txt" &&
-              String(st.val.s) === "42001"
+              st.val.P === "passlist.txt"
             )
-              return "2";
+              return "3";
             return "";
           }
           function paintPreset(which) {
@@ -5244,6 +5604,8 @@
             document.getElementById("h-sim").innerHTML = simHydra(st);
             paintPreset(detectPreset(st));
           }
+
+          applyH({ ck: 1, fF: 1, L: 1, P: 1, V: 1, I: 1, s: 1 });
         }
 
         function hydraStamp(d) {
@@ -5318,7 +5680,7 @@
           var genMax = Math.min(rawMax, rawMin + 4);
           var list = [];
           var q = [""];
-          while (q.length && list.length < 80) {
+          while (q.length && list.length < 120) {
             var cur = q.shift();
             if (cur.length >= rawMin && cur.length <= genMax) list.push(cur);
             if (cur.length < genMax && q.length < 4000) {
@@ -5330,15 +5692,27 @@
         }
         function colonPairs(spec) {
           var raw = String(spec || "").trim();
-          if (raw === "pairs.txt") {
+          if (raw === "pairs.txt" || raw === "credentials.txt") {
             return {
-              pairs: [
-                ["admin", "password"],
-                ["gordonb", "abc123"],
-                ["1337", "charley"],
-                ["pablo", "letmein"],
-                ["smithy", "password"],
-              ],
+              pairs:
+                raw === "credentials.txt"
+                  ? [
+                      ["admin", "password"],
+                      ["admin", "123456"],
+                      ["gordonb", "abc123"],
+                      ["gordonb", "password"],
+                      ["1337", "charley"],
+                      ["pablo", "letmein"],
+                      ["smithy", "password"],
+                      ["smithy", "wrongpass"],
+                    ]
+                  : [
+                      ["admin", "password"],
+                      ["gordonb", "abc123"],
+                      ["1337", "charley"],
+                      ["pablo", "letmein"],
+                      ["smithy", "password"],
+                    ],
               unknown: false,
             };
           }
@@ -5360,8 +5734,8 @@
         function extraKinds(flag) {
           var e = String(flag || "");
           var kinds = [];
-          if (e.indexOf("n") >= 0) kinds.push("null");
           if (e.indexOf("s") >= 0) kinds.push("same");
+          if (e.indexOf("n") >= 0) kinds.push("null");
           if (e.indexOf("r") >= 0) kinds.push("rev");
           return kinds;
         }
@@ -5375,73 +5749,56 @@
         }
 
         function simHydra(st) {
+          if (st.on.R) {
+            var restoredOn = Object.assign({}, st.on);
+            [
+              "l",
+              "L",
+              "p",
+              "P",
+              "C",
+              "e",
+              "x",
+              "y",
+              "u",
+              "S",
+              "s",
+              "M",
+            ].forEach(function (k) {
+              restoredOn[k] = false;
+            });
+            st = Object.assign({}, st, { on: restoredOn });
+          }
           var out = [];
           function add(cls, t) {
             out.push('<span class="' + cls + '">' + esc(t) + "</span>");
           }
+          function pl(n, s, p) {
+            return n === 1 ? s : p;
+          }
           var banner =
             "Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).";
-          if (st.on.R && st.on.I) {
-            add("ln-warn", "[ERROR] -R and -I cannot be used together.");
-            return out.join("\n");
+          var started = new Date();
+
+          function escC(v) {
+            return String(v || "").replace(/(\\*):/g, function (_, bs) {
+              return bs.length % 2 ? bs + ":" : bs + "\\:";
+            });
           }
-          if (
-            st.on.C &&
-            (st.on.l || st.on.L || st.on.p || st.on.P || st.on.x)
-          ) {
-            add(
-              "ln-warn",
-              "[ERROR] -C replaces -l/-L and -p/-P/-x. Turn the others off.",
-            );
-            return out.join("\n");
-          }
-          if (!st.on.C && st.on.l && st.on.L) {
-            add(
-              "ln-warn",
-              "[ERROR] -l and -L are mutually exclusive. Pick one login source.",
-            );
-            return out.join("\n");
-          }
-          var passFlags =
-            (st.on.p ? 1 : 0) + (st.on.P ? 1 : 0) + (st.on.x ? 1 : 0);
-          if (!st.on.C && passFlags > 1) {
-            add(
-              "ln-warn",
-              "[ERROR] use only one password source among -p, -P and -x.",
-            );
-            return out.join("\n");
-          }
-          var hasLoginFlag = !!(st.on.l || st.on.L || st.on.C);
-          var hasPassFlag = !!(passFlags > 0 || st.on.C);
-          if (!st.on.R && !hasLoginFlag) {
-            add(
-              "ln-warn",
-              "[ERROR] a login is required. Use at least one of -l, -L or -C.",
-            );
-            return out.join("\n");
-          }
-          if (!st.on.R && !hasPassFlag) {
-            add(
-              "ln-warn",
-              "[ERROR] a password is required. Use at least one of -p, -P, -x or -C.",
-            );
-            return out.join("\n");
-          }
-          var rawPort = String(st.val.s || "").trim();
-          if (
-            st.on.s &&
-            (!/^\d+$/.test(rawPort) || +rawPort < 1 || +rawPort > 65535)
-          ) {
-            add(
-              "ln-warn",
-              "[ERROR] -s requires a valid port number (1-65535).",
-            );
-            return out.join("\n");
-          }
-          if (st.on.x && !String(st.val.x || "").trim()) {
-            add("ln-warn", "[ERROR] -x requires min:max:charset.");
-            return out.join("\n");
-          }
+          var condType = st.on.fS ? "S" : "F";
+          var condVal = st.on.fS
+            ? String(st.val.fS || "")
+            : String(st.val.fF || "");
+          var condPrefix = condType === "S" ? "S=" : "F=";
+          var cookieStr = st.on.ck ? String(st.val.ck || "").trim() : "";
+          var formParts = [escC(st.path), escC(st.vars)];
+          if (cookieStr) formParts.push("H=Cookie\\: " + escC(cookieStr));
+          if (st.on.fS || st.on.fF) formParts.push(condPrefix + escC(condVal));
+          var form = formParts.join(":");
+
+          add("ln-info", banner);
+          add("ln-plain", "");
+
           var outFmt = st.on.b
             ? String(st.val.b || "")
                 .trim()
@@ -5453,7 +5810,114 @@
             outFmt !== "json" &&
             outFmt !== "jsonv1"
           ) {
-            add("ln-warn", "[ERROR] -b format must be text, json, or jsonv1.");
+            add(
+              "ln-err",
+              "[ERROR] Output file format must be (text, json, jsonv1)",
+            );
+            return out.join("\n");
+          }
+          if (st.on.e) {
+            var badE = String(st.val.e || "").match(/[^nsr]/);
+            if (badE) {
+              add(
+                "ln-err",
+                "[ERROR] unknown mode " +
+                  badE[0] +
+                  ' for option -e, only supporting "n", "s" and "r"',
+              );
+              return out.join("\n");
+            }
+          }
+          if (st.on.R && st.on.I) {
+            add(
+              "ln-info",
+              "[INFORMATION] reading restore file ./hydra.restore",
+            );
+            add("ln-err", "[ERROR] invalid restore file (begin)");
+            add(
+              "ln-warn",
+              "[NOTE] In Hydra v9.7, -R reads ./hydra.restore first; avoid combining -R (resume) with -I (ignore restore).",
+            );
+            return out.join("\n");
+          }
+
+          if (st.on.d) add("ln-info", "[DEBUG] Output color flag is 0");
+          add(
+            "ln-info",
+            "Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at " +
+              hydraStamp(started),
+          );
+
+          if (!st.on.C && st.on.l && st.on.L) {
+            add("ln-err", "[ERROR] You can only use -L OR -l, not both");
+            return out.join("\n");
+          }
+          if (!st.on.C && st.on.p && st.on.P) {
+            add("ln-err", "[ERROR] You can only use -P OR -p, not both");
+            return out.join("\n");
+          }
+          if (form.indexOf("\\:") >= 0 && !st.on.M) {
+            add(
+              "ln-info",
+              "[INFORMATION] escape sequence \\: detected in module option, no parameter verification is performed.",
+            );
+          }
+          if (
+            st.on.C &&
+            (st.on.l || st.on.L || st.on.p || st.on.P || st.on.x)
+          ) {
+            add(
+              "ln-err",
+              "[ERROR] The -C option is standalone, don't use it with -l/L, -p/P or -x!",
+            );
+            return out.join("\n");
+          }
+          var passFlags =
+            (st.on.p ? 1 : 0) + (st.on.P ? 1 : 0) + (st.on.x ? 1 : 0);
+          if (!st.on.C && passFlags > 1) {
+            add(
+              "ln-err",
+              "[ERROR] use only one password source among -p, -P and -x.",
+            );
+            return out.join("\n");
+          }
+          var hasLoginFlag = !!(st.on.l || st.on.L || st.on.C);
+          var hasPassFlag = !!(
+            passFlags > 0 ||
+            st.on.C ||
+            (st.on.e && String(st.val.e || "").trim())
+          );
+          if (!st.on.R && !hasLoginFlag) {
+            add(
+              "ln-err",
+              "[ERROR] I need at least the -l, -L or -C option to have some logins!",
+            );
+            return out.join("\n");
+          }
+          if (!st.on.R && !hasPassFlag) {
+            add(
+              "ln-err",
+              "[ERROR] I need at least the -e, -p, -P or -x option to have some passwords!",
+            );
+            return out.join("\n");
+          }
+          if (!st.on.R && !st.on.fF && !st.on.fS) {
+            add(
+              "ln-err",
+              "[ERROR] a form condition is required. Enable F= (failure) or S= (success).",
+            );
+            return out.join("\n");
+          }
+          var rawPort = String(st.val.s || "").trim();
+          if (
+            st.on.s &&
+            (!/^\d+$/.test(rawPort) || +rawPort < 1 || +rawPort > 65535)
+          ) {
+            add("ln-err", "[ERROR] -s requires a valid port number (1-65535).");
+            return out.join("\n");
+          }
+          if (st.on.x && !String(st.val.x || "").trim()) {
+            add("ln-err", "Error: Invalid option format for -x");
             return out.join("\n");
           }
 
@@ -5462,6 +5926,8 @@
             if (
               sw.val != null &&
               sw.k !== "p" &&
+              sw.k !== "fF" &&
+              sw.k !== "fS" &&
               st.on[sw.k] &&
               !String(st.val[sw.k] || "").trim()
             ) {
@@ -5472,6 +5938,7 @@
           var users = [];
           var passes = [];
           var fixedPairs = null;
+          var xTotal = 0;
           if (st.on.C) {
             var cSpec = String(st.val.C || "").trim();
             var cRes = colonPairs(cSpec);
@@ -5481,16 +5948,7 @@
                 "ln-warn",
                 "[WARNING] File '" +
                   cSpec +
-                  "' is not loaded in this offline simulator. Use 'pairs.txt' or enter inline user:pass pairs.",
-              );
-            } else if (fixedPairs.length) {
-              add(
-                "ln-info",
-                "[DATA] colon file " +
-                  cSpec +
-                  " (" +
-                  fixedPairs.length +
-                  " login:pass pairs)",
+                  "' is not loaded in this offline simulator. Use 'pairs.txt', 'credentials.txt', or inline user:pass pairs.",
               );
             }
           } else {
@@ -5541,13 +5999,14 @@
             } else if (st.on.x) {
               var gen = genX(st.val.x, !!st.on.y);
               if (gen.error) {
-                add("ln-warn", gen.error);
+                add("ln-err", "Error: Invalid option format for -x");
                 return out.join("\n");
               }
               passes = gen.list;
-              var totStr =
-                gen.total > 1000000 ? ">1,000,000" : String(gen.total);
-              if (gen.capped)
+              xTotal = gen.total;
+              if (gen.capped) {
+                var totStr =
+                  gen.total > 1000000 ? ">1,000,000" : String(gen.total);
                 add(
                   "ln-warn",
                   "[DATA] -x set is large (~" +
@@ -5556,19 +6015,12 @@
                     passes.length +
                     " generated passwords.",
                 );
-              else
-                add(
-                  "ln-info",
-                  "[DATA] -x generated " +
-                    passes.length +
-                    " passwords" +
-                    (st.on.y ? " (-y, literal charset)" : "") +
-                    ".",
-                );
-            } else {
+              }
+            } else if (!st.on.e) {
               passes = PASSES.slice();
             }
           }
+
           if (st.on.y && !st.on.x)
             add("ln-info", "[DATA] -y only changes charset generation for -x.");
           if (st.on.b && !st.on.o)
@@ -5576,10 +6028,6 @@
               "ln-warn",
               "[WARNING] -b only applies when -o is also enabled.",
             );
-          if (st.on.e && st.on.C)
-            add("ln-warn", "[WARNING] -e is ignored when using -C.");
-          if (st.on.e && !st.on.C && /[^nsr]/.test(String(st.val.e || "")))
-            add("ln-warn", "[WARNING] -e only supports n, s, and r.");
           if (st.on.t && !/^[1-9]\d*$/.test(String(st.val.t || "").trim()))
             add("ln-warn", "[WARNING] invalid value for -t; using default.");
           if (st.on.T && !/^[1-9]\d*$/.test(String(st.val.T || "").trim()))
@@ -5608,11 +6056,19 @@
               "[WARNING] empty value for option(s): " + emptyOpts.join(", "),
             );
 
-          var kinds = st.on.e && !st.on.C ? extraKinds(st.val.e) : [];
+          var kinds = st.on.e ? extraKinds(st.val.e) : [];
           var pairs = [];
           var loopPassOuter = !!(st.on.u || st.on.x);
           if (fixedPairs) {
+            var seenU = {};
             fixedPairs.forEach(function (pair) {
+              var u = pair[0];
+              if (kinds.length && !seenU[u]) {
+                seenU[u] = true;
+                kinds.forEach(function (kind) {
+                  pairs.push([u, resolveExtra(kind, u)]);
+                });
+              }
               pairs.push(pair);
             });
           } else if (loopPassOuter) {
@@ -5637,7 +6093,7 @@
             });
           }
           if (!pairs.length) {
-            add("ln-warn", "[ERROR] the login or password list is empty.");
+            add("ln-err", "[ERROR] the login or password list is empty.");
             return out.join("\n");
           }
 
@@ -5646,7 +6102,16 @@
             var listed = linesOf(st.val.M);
             hosts = listed.length ? listed : [st.ip];
             if (listed.length === 1 && listed[0] === "targets.txt")
-              hosts = [st.ip, "10.10.10.2"];
+              hosts = [st.ip, st.ip];
+            add(
+              "ln-warn",
+              "[WARNING] With the -M FILE option you can not specify a server on the commandline. Lets hope you did everything right!",
+            );
+          } else if (st.on.T) {
+            add(
+              "ln-warn",
+              "[WARNING] -T is only used with -M (multiple targets); ignoring -T.",
+            );
           }
 
           var port = st.on.s
@@ -5656,49 +6121,72 @@
               : st.on.S || String(st.mod).indexOf("https") === 0
                 ? "443"
                 : "80";
-          var tasks = st.on.t ? clampInt(st.val.t, 16, 1, 64) : 16;
-          var overall = st.on.T
-            ? clampInt(st.val.T, tasks * hosts.length, 1, 256)
-            : tasks * hosts.length;
-          var activeTasks = Math.min(tasks, overall);
+          var cwVal = st.on.cw ? Math.max(0, parseFloat(st.val.cw) || 0) : 0;
+          var reqTasks = st.on.t ? clampInt(st.val.t, 16, 1, 64) : 16;
+          var reqOverall = st.on.M
+            ? st.on.T
+              ? clampInt(st.val.T, 64, 1, 256)
+              : Math.min(reqTasks * hosts.length, 64)
+            : reqTasks;
+          if (st.on.cw && cwVal > 0) {
+            reqTasks = 1;
+            reqOverall = 1;
+          }
+          var skip = st.on.R ? Math.min(20, Math.max(0, pairs.length - 1)) : 0;
+          var shownTries = pairs.length - skip;
+          var cExtraMismatch = !!(fixedPairs && kinds.length);
+          var displayTotal = cExtraMismatch
+            ? fixedPairs.length * (1 + kinds.length)
+            : xTotal && xTotal > passes.length && !fixedPairs
+              ? users.length * (xTotal + kinds.length)
+              : pairs.length;
+          var perServerTasks = Math.max(
+            1,
+            Math.min(
+              reqTasks,
+              Math.floor(reqOverall / hosts.length) || 1,
+              displayTotal,
+            ),
+          );
+          var overallTasks = Math.min(
+            reqOverall,
+            perServerTasks * hosts.length,
+          );
+          var activeTasks = perServerTasks;
+          var triesPerTask = Math.max(
+            1,
+            Math.ceil(displayTotal / perServerTasks),
+          );
           var tryLabel = fixedPairs
-            ? pairs.length + " login tries (C:" + fixedPairs.length + ")"
-            : pairs.length +
-              " login tries (l:" +
+            ? displayTotal + " login " + pl(displayTotal, "try", "tries")
+            : displayTotal +
+              " login " +
+              pl(displayTotal, "try", "tries") +
+              " (l:" +
               users.length +
               "/p:" +
-              (passes.length + kinds.length) +
+              ((xTotal && xTotal > passes.length ? xTotal : passes.length) +
+                kinds.length) +
               ")";
 
-          function escC(v) {
-            return String(v || "").replace(/(\\*):/g, function (_, bs) {
-              return bs.length % 2 ? bs + ":" : bs + "\\:";
-            });
-          }
-          var form =
-            escC(st.path) +
-            ":" +
-            escC(st.vars) +
-            ":H=Cookie\\: PHPSESSID=" +
-            escC(st.session) +
-            "; security=" +
-            st.level +
-            ":F=" +
-            escC(st.fail);
-          var started = new Date();
+          var attackProto =
+            st.on.S && String(st.mod).indexOf("https") !== 0
+              ? st.mod + "s"
+              : st.mod;
+          var attackTargetLabel =
+            hosts.length > 1 ? "(" + hosts.length + " targets)" : hosts[0];
 
-          add("ln-info", banner);
-          add("ln-plain", "");
-          add(
-            "ln-info",
-            "Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at " +
-              hydraStamp(started),
+          var sidM = cookieStr.match(/PHPSESSID\s*=\s*([^;\s]+)/i);
+          var sessionOk = !!(
+            sidM &&
+            /^[a-z0-9,-]{20,64}$/i.test(sidM[1]) &&
+            !/^0+$/.test(sidM[1])
           );
-          if (form.indexOf("\\:") >= 0)
-            add(
-              "ln-info",
-              "[INFORMATION] escape sequence \\: detected in module option, no parameter verification is performed.",
-            );
+          var cmLv = cookieStr.match(
+            /security\s*=\s*(low|medium|high|impossible)\b/i,
+          );
+          var effLevel = cmLv ? cmLv[1].toLowerCase() : "low";
+
           if (!st.on.I && !st.on.R)
             add(
               "ln-warn",
@@ -5709,27 +6197,6 @@
               "ln-info",
               "[DATA] restoring previous session from hydra.restore.",
             );
-          if (st.on.d)
-            add(
-              "ln-info",
-              "[DEBUG] module=" +
-                st.mod +
-                " port=" +
-                port +
-                " tasks=" +
-                activeTasks +
-                " level=" +
-                st.level,
-            );
-          if (st.on.S) add("ln-info", "[DATA] SSL is enabled (-S).");
-          if (st.on.v && !st.on.V)
-            add(
-              "ln-info",
-              "[VERBOSE] attempt lines stay hidden; raise -V to print each login.",
-            );
-
-          var skip = 0;
-          if (st.on.R) skip = Math.min(20, Math.max(0, pairs.length - 1));
           if (skip)
             add(
               "ln-info",
@@ -5737,149 +6204,148 @@
                 skip +
                 " finished tries.",
             );
+          if (!condVal.trim())
+            add(
+              "ln-warn",
+              "[WARNING] condition text (" + condPrefix + ") is empty.",
+            );
+
+          add(
+            "ln-info",
+            "[DATA] max " +
+              perServerTasks +
+              " " +
+              pl(perServerTasks, "task", "tasks") +
+              " per " +
+              hosts.length +
+              " " +
+              pl(hosts.length, "server", "servers") +
+              ", overall " +
+              overallTasks +
+              " " +
+              pl(overallTasks, "task", "tasks") +
+              ", " +
+              tryLabel +
+              ", ~" +
+              triesPerTask +
+              " " +
+              pl(triesPerTask, "try", "tries") +
+              " per task",
+          );
+          add(
+            "ln-info",
+            "[DATA] attacking " +
+              attackProto +
+              "://" +
+              attackTargetLabel +
+              ":" +
+              port +
+              form,
+          );
+
+          if (st.on.v) {
+            add("ln-info", "[VERBOSE] Resolving addresses ... ");
+            if (st.on.d) add("ln-info", "[DEBUG] resolving " + hosts[0]);
+            add("ln-info", "[VERBOSE] resolving done");
+          }
+          if (st.on.d) {
+            add(
+              "ln-info",
+              "[DEBUG] Options: ssl " +
+                (st.on.S || String(st.mod).indexOf("https") === 0 ? 1 : 0) +
+                "  tasks " +
+                activeTasks +
+                "  exit_found " +
+                (st.on.f || st.on.F ? 1 : 0) +
+                "  service " +
+                st.mod,
+            );
+          }
+
+          var isLocalHost = hosts.every(function (h) {
+            return h === "127.0.0.1" || h === "localhost";
+          });
+          var isDvwaPath = /^\/vulnerabilities\/brute\/?$/i.test(st.path);
+          var isCustomTarget =
+            !isLocalHost || (port !== "42001" && !isDvwaPath);
+          var hasUserPh = /\^USER\^/.test(st.vars);
+          var hasPassPh = /\^PASS\^/.test(st.vars);
+          var hasB64Ph = /\^(?:USER64|PASS64)\^/.test(st.vars);
+
+          if (isCustomTarget) {
+            if (!hasUserPh && !hasPassPh && !hasB64Ph) {
+              add(
+                "ln-warn",
+                "[WARNING] form vars do not contain ^USER^ or ^PASS^ placeholders.",
+              );
+            }
+            add(
+              "ln-ok",
+              "[READY] Command syntax is valid and ready to run in terminal.",
+            );
+            add(
+              "ln-info",
+              "[NOTE] Offline simulator only models local DVWA (127.0.0.1:42001).",
+            );
+            return out.join("\n");
+          }
 
           var normPath = st.path.replace(/\/+$/, "");
           var pathOk = normPath === "/vulnerabilities/brute";
           var isHttpsMod = String(st.mod).indexOf("https") === 0;
           var isPostMod = String(st.mod).indexOf("-post-") >= 0;
-          var hasUserPh = /\^USER\^/.test(st.vars);
-          var hasPassPh = /\^PASS\^/.test(st.vars);
-          var userParamOk = /(?:^|&)username=\^USER\^(?:&|$)/.test(st.vars);
-          var passParamOk = /(?:^|&)password=\^PASS\^(?:&|$)/.test(st.vars);
-          var hasUserParam = /(?:^|&)username=/.test(st.vars);
-          var hasPassParam = /(?:^|&)password=/.test(st.vars);
-          var hasB64Ph = /\^(?:USER64|PASS64)\^/.test(st.vars);
+          var uMatch = st.vars.match(/(?:^|&)username=([^&]*)/);
+          var pMatch = st.vars.match(/(?:^|&)password=([^&]*)/);
           var hasLoginBtn = /(?:^|&)Login=/.test(st.vars);
           var portOk = port === "42001";
           var sslMismatch = (isHttpsMod || st.on.S) && portOk;
-          var sessionOk = !!st.session;
           var timeoutSec = st.on.w
             ? Math.max(1, parseFloat(st.val.w) || 32)
             : 32;
           var canReachForm =
             portOk && !sslMismatch && sessionOk && pathOk && hasLoginBtn;
           var mediumApplies =
-            canReachForm && !isPostMod && st.level === "medium";
+            canReachForm && !isPostMod && effLevel === "medium";
 
-          if (!portOk) {
-            if (!st.on.q)
+          if (!portOk || sslMismatch) {
+            var errCount = sslMismatch ? Math.min(activeTasks + 2, 8) : 3;
+            for (var ep = 0; ep < errCount; ep++) {
               add(
                 "ln-err",
-                "[ERROR] could not connect to " +
-                  st.ip +
-                  ":" +
-                  port +
-                  " - Connection refused (DVWA runs on HTTP port 42001).",
+                "[ERROR] Child with pid " +
+                  (107737 + ep * 25) +
+                  " terminating, cannot connect",
               );
+            }
+            add(
+              "ln-err",
+              "[ERROR] all children were disabled due too many connection errors",
+            );
             add(
               "ln-warn",
               "0 of " +
                 hosts.length +
-                " target completed, 0 valid passwords found",
+                " " +
+                pl(hosts.length, "target", "targets") +
+                " completed, 0 valid password found",
             );
             add(
               "ln-info",
               "Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at " +
-                hydraStamp(new Date(started.getTime() + 1000)),
-            );
-            return out.join("\n");
-          }
-          if (sslMismatch) {
-            if (!st.on.q)
-              add(
-                "ln-err",
-                "[ERROR] SSL/TLS handshake failed against HTTP port 42001.",
-              );
-            add(
-              "ln-warn",
-              "0 of " +
-                hosts.length +
-                " target completed, 0 valid passwords found",
-            );
-            add(
-              "ln-info",
-              "Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at " +
-                hydraStamp(new Date(started.getTime() + 1000)),
+                hydraStamp(
+                  new Date(started.getTime() + (sslMismatch ? 1000 : 9000)),
+                ),
             );
             return out.join("\n");
           }
 
-          if (!sessionOk)
-            add(
-              "ln-warn",
-              "[WARNING] PHPSESSID is empty. DVWA returns 302 redirect to login.php (without F= matching 302, Hydra reports false positives).",
-            );
-          if (!pathOk)
-            add(
-              "ln-warn",
-              "[WARNING] path '" +
-                st.path +
-                "' is not /vulnerabilities/brute/. DVWA returns 404 (may trigger false positives with F=).",
-            );
-          if (hasB64Ph)
-            add(
-              "ln-warn",
-              "[WARNING] DVWA expects plain credentials (^USER^ / ^PASS^), not Base64 (^USER64^ / ^PASS64^).",
-            );
-          else if (!hasUserPh || !hasPassPh)
-            add(
-              "ln-warn",
-              "[WARNING] form vars must contain ^USER^ and ^PASS^ placeholders.",
-            );
-          else if (!userParamOk || !passParamOk)
-            add(
-              "ln-warn",
-              "[WARNING] DVWA expects username=^USER^ and password=^PASS^ parameter names.",
-            );
-          if (!hasLoginBtn)
-            add(
-              "ln-warn",
-              "[WARNING] Login=Login parameter is missing; DVWA returns the bare form without checking credentials.",
-            );
-          if (
-            isPostMod &&
-            (st.level === "low" || st.level === "medium" || st.level === "high")
-          )
-            add(
-              "ln-warn",
-              "[WARNING] DVWA low/medium/high brute-force uses GET, not POST (http-post-form).",
-            );
-          if (sessionOk && pathOk && st.level === "medium")
-            add(
-              "ln-warn",
-              "[WARNING] security=medium: DVWA sleeps 2s on each failed login (serialized by PHPSESSID lock).",
-            );
-          if (mediumApplies && timeoutSec < 2 && !st.on.q)
+          if (mediumApplies && timeoutSec < 2)
             add(
               "ln-warn",
               "[WARNING] -w " +
                 timeoutSec +
                 "s is shorter than DVWA medium sleep(2); failed attempts may time out.",
             );
-          if (sessionOk && pathOk && st.level === "high")
-            add(
-              "ln-warn",
-              "[WARNING] security=high: user_token is missing. DVWA redirects (302), which causes false positives with F=; use S=Welcome instead.",
-            );
-          if (sessionOk && pathOk && st.level === "impossible")
-            add(
-              "ln-warn",
-              "[WARNING] security=impossible: requires POST + fresh user_token, sleeps rand(2,4)s on failure, and locks accounts for 15 minutes after 3 failures (F= causes false positives; use S=Welcome).",
-            );
-
-          var shownTries = pairs.length - skip;
-          add(
-            "ln-info",
-            "[DATA] max " +
-              activeTasks +
-              " tasks per 1 server, overall " +
-              overall +
-              " tasks, " +
-              tryLabel +
-              ", ~" +
-              Math.max(1, Math.ceil(shownTries / activeTasks)) +
-              " tries per task",
-          );
 
           var foundN = 0;
           var falsePosN = 0;
@@ -5890,49 +6356,67 @@
 
           hosts.forEach(function (host) {
             if (stopAll) return;
-            add(
-              "ln-info",
-              "[DATA] attacking " + st.mod + "://" + host + ":" + port + form,
-            );
             var solved = {};
+            var fpCount = {};
             for (var n = skip; n < pairs.length; n++) {
               var user = pairs[n][0];
               var pass = pairs[n][1];
               if (solved[user]) continue;
               var child = (n - skip) % activeTasks;
+              var subUser = uMatch
+                ? uMatch[1]
+                    .replace(/\^USER\^/g, user)
+                    .replace(/\^PASS\^/g, pass)
+                : "";
+              var subPass = pMatch
+                ? pMatch[1]
+                    .replace(/\^USER\^/g, user)
+                    .replace(/\^PASS\^/g, pass)
+                : "";
               var respText = "";
               var real = false;
+              var httpError = false;
               if (!pathOk) {
+                httpError = true;
                 respText = "HTTP/1.1 404 Not Found\n404 Not Found";
               } else if (!sessionOk) {
                 respText = "HTTP/1.1 302 Found\nLocation: ../../login.php";
-              } else if (st.level === "high") {
+              } else if (effLevel === "high") {
                 respText =
                   !isPostMod && hasLoginBtn
                     ? "HTTP/1.1 302 Found\nLocation: index.php"
                     : "HTTP/1.1 200 OK\nDVWA Brute Force form";
-              } else if (st.level === "impossible") {
+              } else if (effLevel === "impossible") {
                 respText =
-                  isPostMod && hasLoginBtn && hasUserParam && hasPassParam
+                  isPostMod && hasLoginBtn && uMatch && pMatch
                     ? "HTTP/1.1 302 Found\nLocation: index.php"
                     : "HTTP/1.1 200 OK\nDVWA Brute Force form";
               } else if (isPostMod || !hasLoginBtn) {
                 respText = "HTTP/1.1 200 OK\nDVWA Brute Force form";
-              } else if (userParamOk && passParamOk && CREDS[user] === pass) {
+              } else if (
+                !hasB64Ph &&
+                uMatch &&
+                pMatch &&
+                CREDS[subUser] === subPass
+              ) {
                 real = true;
                 respText =
                   "HTTP/1.1 200 OK\nWelcome to the password protected area " +
-                  user;
+                  subUser;
               } else {
                 respText =
                   "HTTP/1.1 200 OK\nUsername and/or password incorrect.";
-                if (st.level === "medium") failedMediumTries++;
+                if (effLevel === "medium") failedMediumTries++;
               }
 
-              var failMatched = !!st.fail && respText.indexOf(st.fail) >= 0;
-              var reported = !failMatched;
+              var condMatched = !!condVal && respText.indexOf(condVal) >= 0;
+              var reported = httpError
+                ? false
+                : condType === "S"
+                  ? condMatched
+                  : !condMatched;
               tried++;
-              if (st.on.V) {
+              if (st.on.V || st.on.d) {
                 add(
                   "ln-bad",
                   "[ATTEMPT] target " +
@@ -5944,18 +6428,36 @@
                     '" - ' +
                     (n + 1) +
                     " of " +
-                    pairs.length +
+                    displayTotal +
                     " [child " +
                     child +
                     "] (0/0)",
                 );
               }
-              if (st.on.d && reported)
-                add("ln-info", "[DEBUG] child " + child + " accepted " + user);
+              if (st.on.d && n === skip) {
+                add(
+                  "ln-info",
+                  "HTTP request sent: " +
+                    (isPostMod ? "POST " : "GET ") +
+                    st.path +
+                    (isPostMod
+                      ? ""
+                      : "?" +
+                        st.vars
+                          .replace(/\^USER\^/g, user)
+                          .replace(/\^PASS\^/g, pass)) +
+                    " HTTP/1.0",
+                );
+                add(
+                  "ln-info",
+                  "[DEBUG] attempt result: found " +
+                    (condMatched ? 1 : 0) +
+                    ", redirect " +
+                    (respText.indexOf("302") >= 0 ? 1 : 0),
+                );
+              }
               if (reported) {
                 foundN++;
-                if (!real) falsePosN++;
-                solved[user] = true;
                 var foundLine =
                   "[" +
                   port +
@@ -5963,19 +6465,32 @@
                   st.mod +
                   "] host: " +
                   host +
+                  "   misc: " +
+                  form +
                   "   login: " +
                   user +
                   "   password: " +
                   pass;
                 add("ln-hit", foundLine);
+                if (real) {
+                  solved[user] = true;
+                } else {
+                  falsePosN++;
+                  fpCount[user] = (fpCount[user] || 0) + 1;
+                  if (fpCount[user] >= activeTasks) solved[user] = true;
+                }
                 if (st.on.f || st.on.F) {
                   add(
                     "ln-ok",
-                    "[STATUS] stopped after the first valid pair (" +
-                      (st.on.F ? "-F" : "-f") +
-                      ").",
+                    "[STATUS] attack finished for " +
+                      host +
+                      " (valid pair found)",
                   );
-                  if (st.on.F || !st.on.M) stopAll = true;
+                  if (st.on.F) {
+                    hostsDone = hosts.length;
+                    stopAll = true;
+                    return;
+                  }
                   break;
                 }
               }
@@ -5983,18 +6498,26 @@
             hostsDone++;
           });
 
+          if (st.on.d && foundN === 0) {
+            add(
+              "ln-info",
+              "[STATUS] attack finished for " +
+                hosts[0] +
+                " (waiting for children to complete tests)",
+            );
+          }
+
           var waitSec = !st.on.I && !st.on.R ? 10 : 0;
           var normalTries = Math.max(0, tried - failedMediumTries);
           var waves = normalTries ? Math.ceil(normalTries / activeTasks) : 0;
+          var connsPerTry = /-form$/.test(st.mod) ? 2 : 1;
           var perConnW = st.on.W ? Math.max(0, parseFloat(st.val.W) || 0) : 0;
-          var globalC = st.on.cw
-            ? tried * Math.max(0, parseFloat(st.val.cw) || 0)
-            : 0;
+          var globalC = st.on.cw ? tried * connsPerTry * cwVal : 0;
           var elapsed = Math.max(
             1,
             Math.round(
               failedMediumTries * 2 +
-                waves * (0.18 + perConnW) +
+                waves * (0.18 + connsPerTry * perConnW) +
                 globalC +
                 waitSec,
             ),
@@ -6013,25 +6536,55 @@
             );
           }
           var finished = new Date(started.getTime() + elapsed * 1000);
-          var noun =
-            foundN === 1
-              ? "1 valid password found"
-              : foundN + " valid passwords found";
-          add(
-            foundN > 0 && !falsePosN ? "ln-ok" : "ln-warn",
-            hostsDone +
-              " of " +
-              hosts.length +
-              " target successfully completed, " +
-              noun,
-          );
-          if (falsePosN > 0)
+          var targetWord = pl(hosts.length, "target", "targets");
+          if (foundN > 0) {
+            add(
+              !falsePosN ? "ln-ok" : "ln-warn",
+              hostsDone +
+                " of " +
+                hosts.length +
+                " " +
+                targetWord +
+                " successfully completed, " +
+                foundN +
+                " valid " +
+                pl(foundN, "password", "passwords") +
+                " found",
+            );
+          } else {
             add(
               "ln-warn",
-              "[WARNING] " +
-                falsePosN +
-                " false positive(s): F= did not appear in the server response, so Hydra treated non-failure responses as valid.",
+              hostsDone +
+                " of " +
+                hosts.length +
+                " " +
+                targetWord +
+                " completed, 0 valid password found",
             );
+          }
+          if (cExtraMismatch && displayTotal > pairs.length) {
+            add(
+              "ln-warn",
+              "[NOTE] Hydra v9.7 counts -e extras per line in -C (" +
+                displayTotal +
+                " tries) while only running -e once per unique login (" +
+                pairs.length +
+                " actual tries); real Hydra v9.7 may stall waiting for the remaining " +
+                (displayTotal - pairs.length) +
+                ".",
+            );
+          }
+          if (falsePosN > 0) {
+            add(
+              "ln-warn",
+              "[NOTE] " +
+                falsePosN +
+                " false positive(s): " +
+                (condType === "S"
+                  ? "S= matched a non-success response."
+                  : "F= did not appear in the server response, so each parallel task reported its attempt as valid (switch to S=Welcome to avoid this flood)."),
+            );
+          }
           if (st.on.o && String(st.val.o || "").trim())
             add(
               "ln-info",
@@ -6051,96 +6604,171 @@
 
         /* ================= WFUZZ BUILDER ================= */
         var WZ = [
-          { k: "c", f: "-c", g: "پایه" },
-          { k: "v", f: "-v", g: "پایه" },
+          { k: "c", f: "-c", g: "پایه", hint: "رنگی کردن جدول خروجی" },
+          { k: "v", f: "-v", g: "پایه", hint: "نمایش جزئیات بیشتر در خروجی" },
           {
             k: "z1",
             f: "-z",
             g: "پایه",
             val: "file,passlist.txt",
-            hint: "payload اول = FUZZ",
+            hint: "payload اول (جایگزین FUZZ)",
           },
           {
             k: "z2",
             f: "-z",
             g: "پایه",
             val: "file,passlist.txt",
-            hint: "payload دوم = FUZ2Z",
+            hint: "payload دوم (جایگزین FUZ2Z)",
+          },
+          {
+            k: "w",
+            f: "-w",
+            g: "پایه",
+            val: "passlist.txt",
+            hint: "میانبر فایل واژه‌نامه (معادل -z file,...)",
           },
           {
             k: "b",
             f: "-b",
             g: "درخواست",
             val: "PHPSESSID=f152050718ca0bd419db3ca17afe3e2d; security=low",
-            hint: "کوکی",
+            hint: "کوکی درخواست",
           },
-          { k: "H", f: "-H", g: "درخواست", val: "Accept: */*", hint: "هدر" },
+          {
+            k: "H",
+            f: "-H",
+            g: "درخواست",
+            val: "Accept: */*",
+            hint: "هدر HTTP اضافه",
+          },
           {
             k: "d",
             f: "-d",
             g: "درخواست",
             val: "username=FUZZ&password=FUZ2Z&Login=Login",
-            hint: "بدنه",
+            hint: "بدنه درخواست POST",
           },
-          { k: "X", f: "-X", g: "درخواست", val: "GET", hint: "متد" },
+          { k: "X", f: "-X", g: "درخواست", val: "GET", hint: "متد HTTP" },
+          {
+            k: "basic",
+            f: "--basic",
+            g: "درخواست",
+            val: "admin:password",
+            hint: "احراز هویت HTTP Basic (user:pass)",
+          },
           {
             k: "p",
             f: "-p",
             g: "درخواست",
             val: "127.0.0.1:8080:HTTP",
-            hint: "پروکسی",
+            hint: "آدرس پروکسی",
           },
-          { k: "t", f: "-t", g: "درخواست", val: "10", hint: "هم‌زمانی" },
-          { k: "s", f: "-s", g: "درخواست", val: "0", hint: "تأخیر" },
-          { k: "L", f: "-L", g: "درخواست" },
+          {
+            k: "t",
+            f: "-t",
+            g: "درخواست",
+            val: "10",
+            hint: "تعداد اتصال هم‌زمان",
+          },
+          {
+            k: "s",
+            f: "-s",
+            g: "درخواست",
+            val: "0",
+            hint: "تأخیر بین درخواست‌ها (ثانیه)",
+          },
+          { k: "L", f: "-L", g: "درخواست", hint: "دنبال کردن ریدایرکت ۳۰۲" },
           {
             k: "m",
             f: "-m",
             g: "درخواست",
             val: "product",
-            hint: "product یا zip",
+            hint: "شیوه ترکیب (product / zip / chain)",
           },
-          { k: "f", f: "-f", g: "خروجی", val: "out.txt,raw", hint: "ذخیره" },
+          {
+            k: "f",
+            f: "-f",
+            g: "خروجی",
+            val: "out.txt,raw",
+            hint: "ذخیره خروجی در فایل",
+          },
+          {
+            k: "flt",
+            f: "--filter",
+            g: "فیلتر",
+            val: "c=200 and w!=258",
+            hint: "فیلتر عبارتی (c, l, w, h, BBB, and, or)",
+          },
           {
             k: "hs",
             f: "--hs",
             g: "فیلتر",
             val: "incorrect",
-            hint: "پنهان با متن",
+            hint: "پنهان کردن بر اساس متن",
           },
-          { k: "hw", f: "--hw", g: "فیلتر", val: "258", hint: "پنهان با کلمه" },
+          {
+            k: "hw",
+            f: "--hw",
+            g: "فیلتر",
+            val: "258",
+            hint: "پنهان کردن بر اساس تعداد کلمه",
+          },
           {
             k: "hh",
             f: "--hh",
             g: "فیلتر",
             val: "4436",
-            hint: "پنهان با نویسه",
+            hint: "پنهان کردن بر اساس تعداد نویسه",
           },
-          { k: "hc", f: "--hc", g: "فیلتر", val: "404", hint: "پنهان با کد" },
-          { k: "hl", f: "--hl", g: "فیلتر", val: "111", hint: "پنهان با خط" },
+          {
+            k: "hc",
+            f: "--hc",
+            g: "فیلتر",
+            val: "404",
+            hint: "پنهان کردن بر اساس کد وضعیت",
+          },
+          {
+            k: "hl",
+            f: "--hl",
+            g: "فیلتر",
+            val: "111",
+            hint: "پنهان کردن بر اساس تعداد خط",
+          },
           {
             k: "ss",
             f: "--ss",
             g: "فیلتر",
             val: "Welcome",
-            hint: "نمایان با متن",
+            hint: "نمایش فقط با متن مشخص",
           },
           {
             k: "sw",
             f: "--sw",
             g: "فیلتر",
             val: "262",
-            hint: "نمایان با کلمه",
+            hint: "نمایش فقط با تعداد کلمه مشخص",
           },
           {
             k: "sh",
             f: "--sh",
             g: "فیلتر",
             val: "4474",
-            hint: "نمایان با نویسه",
+            hint: "نمایش فقط با تعداد نویسه مشخص",
           },
-          { k: "sc", f: "--sc", g: "فیلتر", val: "200", hint: "نمایان با کد" },
-          { k: "sl", f: "--sl", g: "فیلتر", val: "111", hint: "نمایان با خط" },
+          {
+            k: "sc",
+            f: "--sc",
+            g: "فیلتر",
+            val: "200",
+            hint: "نمایش فقط با کد وضعیت مشخص",
+          },
+          {
+            k: "sl",
+            f: "--sl",
+            g: "فیلتر",
+            val: "111",
+            hint: "نمایش فقط با تعداد خط مشخص",
+          },
         ];
 
         function mountWfuzz() {
@@ -6156,9 +6784,13 @@
               var label =
                 sw.f + (sw.k === "z2" ? " #2" : sw.k === "z1" ? " #1" : "");
               chips +=
-                '<button type="button" class="chip" data-k="' +
+                '<button type="button" class="chip" id="w-sw-' +
                 sw.k +
-                '" aria-pressed="false" dir="ltr">' +
+                '" data-k="' +
+                sw.k +
+                '" aria-pressed="false" dir="ltr" title="' +
+                esc(sw.hint || label) +
+                '">' +
                 label +
                 "</button>";
             });
@@ -6171,46 +6803,60 @@
               var label =
                 sw.f + (sw.k === "z2" ? " #2" : sw.k === "z1" ? " #1" : "");
               return (
-                '<label class="val" id="w-lab-' +
+                '<div class="val" id="w-lab-' +
                 sw.k +
-                '"><span dir="ltr">' +
+                '">' +
+                '<label class="val-k" for="w-val-' +
+                sw.k +
+                '" dir="ltr" title="' +
+                esc(sw.hint || label) +
+                '">' +
                 label +
-                '</span><input id="w-val-' +
+                "</label>" +
+                '<input id="w-val-' +
                 sw.k +
                 '" dir="ltr" value="' +
                 esc(sw.val) +
+                '" placeholder="' +
+                esc(sw.hint || "") +
                 '" aria-label="' +
-                esc(sw.hint) +
-                '"></label>'
+                esc(sw.hint || label) +
+                '">' +
+                '<button type="button" class="val-x" data-k="' +
+                sw.k +
+                '" title="خاموش کردن ' +
+                esc(label) +
+                '" aria-label="خاموش کردن ' +
+                esc(label) +
+                '">×</button>' +
+                "</div>"
               );
             })
             .join("");
+
           root.innerHTML =
             '<div class="builder-split">' +
             '<div class="builder-controls">' +
             '<div class="presets">' +
-            '<button type="button" class="btn light sm" id="w-p1" data-preset="1">نمونه ۱ — تست رمز برای admin</button>' +
-            '<button type="button" class="btn light sm" id="w-p2" data-preset="2">نمونه ۲ — تست کاربر و رمز</button>' +
+            '<button type="button" class="btn light sm" id="w-p1" data-preset="1">نمونه ۱ — تست رمز برای admin (DVWA)</button>' +
+            '<button type="button" class="btn light sm" id="w-p2" data-preset="2">نمونه ۲ — تست کاربر و رمز (DVWA)</button>' +
+            '<button type="button" class="btn light sm" id="w-p3" data-preset="3">نمونه ۳ — سایت عمومی (POST بدون کوکی)</button>' +
             '<button type="button" class="btn outline sm" data-dl="user">دانلود userlist.txt</button>' +
             '<button type="button" class="btn outline sm" data-dl="pass">دانلود passlist.txt</button>' +
             "</div>" +
             '<div class="ctrl-card">' +
-            '<div class="ctrl-title">تنظیمات پایه آدرس و نشست</div>' +
-            '<label class="field">URL<input id="w-url" dir="ltr" value=""></label>' +
-            '<div class="fields">' +
-            '<label class="field">Session ID<input id="w-session" dir="ltr" value="f152050718ca0bd419db3ca17afe3e2d"></label>' +
-            '<label class="field">سطح امنیتی<select id="w-level" dir="ltr"><option>low</option><option>medium</option><option>high</option><option>impossible</option></select></label>' +
-            "</div>" +
-            "</div>" +
-            '<div class="ctrl-card ctrl-switches">' +
-            '<div class="ctrl-title">انتخاب سوییچ‌ها و فیلترها</div>' +
-            chips +
+            '<div class="ctrl-title"><span class="ctrl-title-main">آدرس هدف</span></div>' +
+            '<label class="field">URL (همراه با کلیدواژه FUZZ در صورت نیاز)<input id="w-url" dir="ltr" value=""></label>' +
             "</div>" +
             '<div class="ctrl-card ctrl-vals">' +
-            '<div class="ctrl-title">مقادیر سوییچ‌های فعال</div>' +
+            '<div class="ctrl-title"><span class="ctrl-title-main">مقادیر سوییچ‌های فعال</span><span class="ctrl-sub">ویرایش مستقیم یا حذف با ×</span></div>' +
             '<div class="vals">' +
             vals +
             "</div>" +
+            "</div>" +
+            '<div class="ctrl-card ctrl-switches">' +
+            '<div class="ctrl-title"><span class="ctrl-title-main">سوییچ‌ها و فیلترها</span><span class="ctrl-sub">کلیک برای روشن یا خاموش کردن</span></div>' +
+            chips +
             "</div>" +
             "</div>" +
             '<div class="builder-output">' +
@@ -6227,33 +6873,40 @@
             "http://127.0.0.1:42001/vulnerabilities/brute/?username=admin&password=FUZZ&Login=Login";
           var url2 =
             "http://127.0.0.1:42001/vulnerabilities/brute/?username=FUZZ&password=FUZ2Z&Login=Login";
+          var url3 = "http://lab.local/login";
           document.getElementById("w-url").value = url1;
+
+          function setChip(k, on) {
+            var btn = document.getElementById("w-sw-" + k);
+            if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+            var lab = document.getElementById("w-lab-" + k);
+            if (lab) lab.classList.toggle("show", on);
+          }
 
           root.querySelectorAll(".chip").forEach(function (b) {
             b.addEventListener("click", function () {
               var on = b.getAttribute("aria-pressed") !== "true";
-              b.setAttribute("aria-pressed", on ? "true" : "false");
-              var lab = document.getElementById("w-lab-" + b.dataset.k);
-              if (lab) lab.classList.toggle("show", on);
+              setChip(b.dataset.k, on);
               refresh();
             });
           });
-          root.querySelectorAll("input, select").forEach(function (el) {
-            function onEdit() {
-              if (el.id === "w-session") syncCookie(false, "session");
-              else if (el.id === "w-level") syncCookie(false, "level");
+          root.querySelectorAll(".val-x").forEach(function (x) {
+            x.addEventListener("click", function () {
+              setChip(x.dataset.k, false);
               refresh();
-            }
-            el.addEventListener("input", onEdit);
-            el.addEventListener("change", onEdit);
+            });
           });
+          root.querySelectorAll("input").forEach(function (el) {
+            el.addEventListener("input", refresh);
+            el.addEventListener("change", refresh);
+          });
+
           function resetWBase() {
-            var sEl = document.getElementById("w-session");
-            if (!sEl.value.trim())
-              sEl.value = "f152050718ca0bd419db3ca17afe3e2d";
-            document.getElementById("w-level").value = "low";
-            var b = document.getElementById("w-val-b");
-            if (b) delete b.dataset.dirty;
+            document.getElementById("w-val-b").value =
+              "PHPSESSID=f152050718ca0bd419db3ca17afe3e2d; security=low";
+            document.getElementById("w-val-d").value =
+              "username=FUZZ&password=FUZ2Z&Login=Login";
+            document.getElementById("w-val-hs").value = "incorrect";
           }
           document
             .getElementById("w-p1")
@@ -6272,57 +6925,23 @@
               document.getElementById("w-val-z2").value = "file,passlist.txt";
               apply({ c: 1, z1: 1, z2: 1, b: 1 });
             });
-          apply({ c: 1, z1: 1, b: 1 });
+          document
+            .getElementById("w-p3")
+            .addEventListener("click", function () {
+              document.getElementById("w-url").value = url3;
+              document.getElementById("w-val-z1").value = "file,passlist.txt";
+              document.getElementById("w-val-d").value =
+                "username=admin&password=FUZZ";
+              document.getElementById("w-val-hs").value = "Invalid";
+              apply({ c: 1, z1: 1, d: 1, hs: 1 });
+            });
 
           function apply(map) {
             root.querySelectorAll(".chip").forEach(function (b) {
-              var on = !!map[b.dataset.k];
-              b.setAttribute("aria-pressed", on ? "true" : "false");
-              var lab = document.getElementById("w-lab-" + b.dataset.k);
-              if (lab) lab.classList.toggle("show", on);
+              setChip(b.dataset.k, !!map[b.dataset.k]);
             });
-            syncCookie(true);
             refresh();
           }
-          function syncCookie(force, field) {
-            var el = document.getElementById("w-val-b");
-            if (!el) return;
-            var sid = document.getElementById("w-session").value.trim();
-            var lv = document.getElementById("w-level").value;
-            if (force || !el.dataset.dirty) {
-              el.value = "PHPSESSID=" + sid + "; security=" + lv;
-            } else {
-              var cur = el.value;
-              if (!field || field === "session") {
-                cur = /PHPSESSID\s*=[^;]*/i.test(cur)
-                  ? cur.replace(/PHPSESSID\s*=[^;]*/i, "PHPSESSID=" + sid)
-                  : "PHPSESSID=" + sid + (cur ? "; " + cur : "");
-              }
-              if (!field || field === "level") {
-                cur = /security\s*=[^;]*/i.test(cur)
-                  ? cur.replace(/security\s*=[^;]*/i, "security=" + lv)
-                  : cur
-                    ? cur + "; security=" + lv
-                    : "security=" + lv;
-              }
-              el.value = cur;
-            }
-          }
-          document
-            .getElementById("w-val-b")
-            .addEventListener("input", function (e) {
-              e.target.dataset.dirty = "1";
-              var raw = e.target.value;
-              var lvM = raw.match(
-                /security\s*=\s*(low|medium|high|impossible)\b/i,
-              );
-              if (lvM)
-                document.getElementById("w-level").value = lvM[1].toLowerCase();
-              var sidM = raw.match(/PHPSESSID\s*=\s*([^;\s]*)/i);
-              if (sidM) document.getElementById("w-session").value = sidM[1];
-              refresh();
-            });
-
           function read() {
             var on = {},
               val = {};
@@ -6337,19 +6956,20 @@
               on: on,
               val: val,
               url: document.getElementById("w-url").value.trim(),
-              level: document.getElementById("w-level").value,
-              session: document.getElementById("w-session").value.trim(),
             };
           }
           function command(st) {
             var parts = ["wfuzz"];
+            var alwaysQ = { b: 1, H: 1, d: 1, basic: 1, flt: 1, hs: 1, ss: 1 };
             WZ.forEach(function (sw) {
               if (!st.on[sw.k]) return;
               parts.push(sw.f);
-              if (sw.val != null)
-                parts.push(quote(st.val[sw.k] == null ? "" : st.val[sw.k]));
+              if (sw.val != null) {
+                var v = st.val[sw.k] == null ? "" : st.val[sw.k];
+                parts.push(alwaysQ[sw.k] ? alwaysQuote(v) : quote(v));
+              }
             });
-            parts.push(quote(st.url));
+            parts.push(alwaysQuote(st.url));
             return parts.join(" ");
           }
           function keysOn(st, keys) {
@@ -6364,24 +6984,29 @@
             return true;
           }
           function detectPreset(st) {
-            var bLv = String(st.val.b || "").match(
-              /security\s*=\s*([A-Za-z]+)/i,
-            );
-            var effLevel = st.on.b && bLv ? bLv[1].toLowerCase() : st.level;
-            if (st.level !== "low" || effLevel !== "low") return "";
+            if (/security\s*=\s*low\b/i.test(String(st.val.b || ""))) {
+              if (
+                keysOn(st, ["c", "z1", "b"]) &&
+                st.url === url1 &&
+                st.val.z1 === "file,passlist.txt"
+              )
+                return "1";
+              if (
+                keysOn(st, ["c", "z1", "z2", "b"]) &&
+                st.url === url2 &&
+                st.val.z1 === "file,userlist.txt" &&
+                st.val.z2 === "file,passlist.txt"
+              )
+                return "2";
+            }
             if (
-              keysOn(st, ["c", "z1", "b"]) &&
-              st.url === url1 &&
-              st.val.z1 === "file,passlist.txt"
+              st.url === url3 &&
+              keysOn(st, ["c", "z1", "d", "hs"]) &&
+              st.val.z1 === "file,passlist.txt" &&
+              st.val.d === "username=admin&password=FUZZ" &&
+              st.val.hs === "Invalid"
             )
-              return "1";
-            if (
-              keysOn(st, ["c", "z1", "z2", "b"]) &&
-              st.url === url2 &&
-              st.val.z1 === "file,userlist.txt" &&
-              st.val.z2 === "file,passlist.txt"
-            )
-              return "2";
+              return "3";
             return "";
           }
           function paintPreset(which) {
@@ -6398,6 +7023,8 @@
             document.getElementById("w-sim").innerHTML = simWfuzz(st);
             paintPreset(detectPreset(st));
           }
+
+          apply({ c: 1, z1: 1, b: 1 });
         }
 
         function listFromZ(spec) {
@@ -6434,6 +7061,11 @@
             items = USERS.slice();
           } else if (arg === "passlist.txt") {
             items = PASSES.slice();
+          } else if (arg === "sessid_fuzz.txt") {
+            items = [
+              "f152050718ca0bd419db3ca17afe3e2d",
+              "00000000000000000000000000000000",
+            ];
           } else if (
             kind === "file" &&
             /\.(txt|lst|dic|wordlist)$/i.test(arg)
@@ -6444,6 +7076,231 @@
             items = linesOf(arg);
           }
           return { items: items, encoder: enc, unknownFile: unknownFile };
+        }
+
+        function wfMd5(str) {
+          var utf8 = unescape(encodeURIComponent(String(str)));
+          var len = utf8.length;
+          var words = [];
+          for (var i = 0; i < len; i++) {
+            words[i >> 2] =
+              (words[i >> 2] || 0) |
+              ((utf8.charCodeAt(i) & 0xff) << ((i % 4) * 8));
+          }
+          words[len >> 2] = (words[len >> 2] || 0) | (0x80 << ((len % 4) * 8));
+          var bitLen = len * 8;
+          var totalWords = (((len + 8) >> 6) + 1) * 16;
+          words[totalWords - 2] = bitLen & 0xffffffff;
+          words[totalWords - 1] = Math.floor(bitLen / 0x100000000);
+          var S = [
+            7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9,
+            14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4,
+            11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15,
+            21, 6, 10, 15, 21, 6, 10, 15, 21,
+          ];
+          var K = [];
+          for (var k = 0; k < 64; k++)
+            K[k] = Math.floor(Math.abs(Math.sin(k + 1)) * 0x100000000) >>> 0;
+          var a0 = 0x67452301,
+            b0 = 0xefcdab89,
+            c0 = 0x98badcfe,
+            d0 = 0x10325476;
+          for (var off = 0; off < totalWords; off += 16) {
+            var A = a0,
+              B = b0,
+              C = c0,
+              D = d0;
+            for (var j = 0; j < 64; j++) {
+              var F, g;
+              if (j < 16) {
+                F = (B & C) | (~B & D);
+                g = j;
+              } else if (j < 32) {
+                F = (D & B) | (~D & C);
+                g = (5 * j + 1) % 16;
+              } else if (j < 48) {
+                F = B ^ C ^ D;
+                g = (3 * j + 5) % 16;
+              } else {
+                F = C ^ (B | ~D);
+                g = (7 * j) % 16;
+              }
+              var sum = (A + F + K[j] + (words[off + g] || 0)) >>> 0;
+              var rot = ((sum << S[j]) | (sum >>> (32 - S[j]))) >>> 0;
+              A = D;
+              D = C;
+              C = B;
+              B = (B + rot) >>> 0;
+            }
+            a0 = (a0 + A) >>> 0;
+            b0 = (b0 + B) >>> 0;
+            c0 = (c0 + C) >>> 0;
+            d0 = (d0 + D) >>> 0;
+          }
+          function hexLE(n) {
+            var h = "";
+            for (var b = 0; b < 4; b++)
+              h += ((n >>> (b * 8)) & 0xff).toString(16).padStart(2, "0");
+            return h;
+          }
+          return hexLE(a0) + hexLE(b0) + hexLE(c0) + hexLE(d0);
+        }
+
+        function applyWfEncoder(val, encSpec) {
+          var s = String(val == null ? "" : val);
+          var chain = String(encSpec || "").trim();
+          if (!chain) return { value: s, unknown: "" };
+          var parts = chain
+            .split("@")
+            .map(function (x) {
+              return x.trim().toLowerCase();
+            })
+            .filter(Boolean);
+          var unknown = "";
+          for (var i = 0; i < parts.length; i++) {
+            var e = parts[i];
+            if (e === "none") continue;
+            else if (e === "md5") s = wfMd5(s);
+            else if (e === "base64") s = btoa(unescape(encodeURIComponent(s)));
+            else if (e === "urlencode") s = encodeURIComponent(s);
+            else if (e === "double_urlencode")
+              s = encodeURIComponent(encodeURIComponent(s));
+            else if (e === "hex") {
+              var u = unescape(encodeURIComponent(s));
+              var h = "";
+              for (var j = 0; j < u.length; j++)
+                h += u.charCodeAt(j).toString(16).padStart(2, "0");
+              s = h;
+            } else {
+              unknown = parts[i];
+            }
+          }
+          return { value: s, unknown: unknown };
+        }
+
+        function compileWfFilter(expr) {
+          var src = String(expr || "").trim();
+          if (!src) return { error: "Empty --filter expression." };
+          var tokens = [];
+          var re =
+            /\s*(?:(\(|\))|(==|!=|<=|>=|=|<|>)|\b(and|or|not)\b|\b(BBB)\b|\b([clwh])\b|(\d+)|(\S+))/gi;
+          var m;
+          while ((m = re.exec(src)) !== null) {
+            if (m[1]) tokens.push({ t: "p", v: m[1] });
+            else if (m[2]) tokens.push({ t: "op", v: m[2] });
+            else if (m[3]) tokens.push({ t: "kw", v: m[3].toLowerCase() });
+            else if (m[4]) tokens.push({ t: "bbb", v: "BBB" });
+            else if (m[5]) tokens.push({ t: "field", v: m[5].toLowerCase() });
+            else if (m[6]) tokens.push({ t: "num", v: parseInt(m[6], 10) });
+            else
+              return {
+                error: "Invalid token '" + m[7] + "' in --filter expression.",
+              };
+          }
+          var pos = 0;
+          function peek() {
+            return tokens[pos];
+          }
+          function next() {
+            return tokens[pos++];
+          }
+          function fieldVal(name, obj) {
+            if (name === "c") return obj.code;
+            if (name === "l") return obj.lines;
+            if (name === "w") return obj.words;
+            return obj.chars;
+          }
+          function parseOr() {
+            var left = parseAnd();
+            while (peek() && peek().t === "kw" && peek().v === "or") {
+              next();
+              var right = parseAnd();
+              (function (l, r) {
+                left = function (row, base) {
+                  return l(row, base) || r(row, base);
+                };
+              })(left, right);
+            }
+            return left;
+          }
+          function parseAnd() {
+            var left = parseNot();
+            while (peek() && peek().t === "kw" && peek().v === "and") {
+              next();
+              var right = parseNot();
+              (function (l, r) {
+                left = function (row, base) {
+                  return l(row, base) && r(row, base);
+                };
+              })(left, right);
+            }
+            return left;
+          }
+          function parseNot() {
+            if (peek() && peek().t === "kw" && peek().v === "not") {
+              next();
+              var inner = parseNot();
+              return function (row, base) {
+                return !inner(row, base);
+              };
+            }
+            return parsePrimary();
+          }
+          function parsePrimary() {
+            var tk = peek();
+            if (!tk) throw new Error("Unexpected end of --filter expression.");
+            if (tk.t === "p" && tk.v === "(") {
+              next();
+              var fn = parseOr();
+              if (!peek() || peek().t !== "p" || peek().v !== ")")
+                throw new Error("Missing ')' in --filter expression.");
+              next();
+              return fn;
+            }
+            if (tk.t !== "field")
+              throw new Error(
+                "Expected field (c, l, w, h) in --filter expression.",
+              );
+            var f = next().v;
+            var op = next();
+            if (!op || op.t !== "op")
+              throw new Error(
+                "Expected comparison operator after '" + f + "'.",
+              );
+            var rhs = next();
+            if (
+              !rhs ||
+              (rhs.t !== "num" && rhs.t !== "bbb" && rhs.t !== "field")
+            ) {
+              throw new Error(
+                "Expected number, BBB, or field after '" + op.v + "'.",
+              );
+            }
+            return function (row, base) {
+              var lv = fieldVal(f, row);
+              var rv =
+                rhs.t === "bbb"
+                  ? fieldVal(f, base)
+                  : rhs.t === "field"
+                    ? fieldVal(rhs.v, row)
+                    : rhs.v;
+              if (op.v === "=" || op.v === "==") return lv === rv;
+              if (op.v === "!=") return lv !== rv;
+              if (op.v === "<") return lv < rv;
+              if (op.v === ">") return lv > rv;
+              if (op.v === "<=") return lv <= rv;
+              if (op.v === ">=") return lv >= rv;
+              return false;
+            };
+          }
+          try {
+            var fn = parseOr();
+            if (pos !== tokens.length)
+              throw new Error("Unexpected token in --filter expression.");
+            return { fn: fn };
+          } catch (e) {
+            return { error: e.message };
+          }
         }
         function nums(spec) {
           return String(spec || "")
@@ -6482,26 +7339,68 @@
           var zSpecs = [];
           if (st.on.z1) zSpecs.push(st.val.z1);
           if (st.on.z2) zSpecs.push(st.val.z2);
+          if (st.on.w) zSpecs.push("file," + String(st.val.w || "").trim());
           if (!zSpecs.length) {
-            add("ln-warn", "No -z payload. Nothing is substituted.");
+            add("ln-warn", "No -z or -w payload. Nothing is substituted.");
             return out.join("\n");
           }
 
-          var hasHideNum = !!(st.on.hc || st.on.hl || st.on.hw || st.on.hh);
-          var hasShowNum = !!(st.on.sc || st.on.sl || st.on.sw || st.on.sh);
-          if (hasHideNum && hasShowNum) {
+          if (st.on.hs && st.on.ss) {
             add(
-              "ln-warn",
-              "Fatal exception: Bad usage: Hide and show filters flags are mutually exclusive.",
+              "ln-err",
+              "Fatal exception: Bad usage: Hide and show regex filters flags are mutually exclusive. Only one could be specified.",
             );
             return out.join("\n");
           }
-          if (st.on.hs && st.on.ss) {
-            add(
-              "ln-warn",
-              "Fatal exception: Bad usage: Hide and show regex filters flags (--hs and --ss) are mutually exclusive.",
-            );
-            return out.join("\n");
+
+          var hsRegex = null,
+            ssRegex = null;
+          if (st.on.hs && String(st.val.hs || "")) {
+            try {
+              hsRegex = new RegExp(st.val.hs);
+            } catch (e) {
+              add("ln-err", "Fatal exception: Invalid regex expression");
+              return out.join("\n");
+            }
+          }
+          if (st.on.ss && String(st.val.ss || "")) {
+            try {
+              ssRegex = new RegExp(st.val.ss);
+            } catch (e) {
+              add("ln-err", "Fatal exception: Invalid regex expression");
+              return out.join("\n");
+            }
+          }
+
+          var fltCompiled = null;
+          if (st.on.flt) {
+            fltCompiled = compileWfFilter(st.val.flt);
+            if (fltCompiled.error) {
+              add(
+                "ln-err",
+                "Fatal exception: Bad options: " + fltCompiled.error,
+              );
+              return out.join("\n");
+            }
+          }
+
+          var numFilterKeys = ["hc", "hl", "hw", "hh", "sc", "sl", "sw", "sh"];
+          for (var fi = 0; fi < numFilterKeys.length; fi++) {
+            var fk = numFilterKeys[fi];
+            if (!st.on[fk]) continue;
+            var toks = nums(st.val[fk]);
+            if (
+              !toks.length ||
+              toks.some(function (x) {
+                return !/^(?:\d+|BBB|XXX)$/.test(x);
+              })
+            ) {
+              add(
+                "ln-err",
+                "Fatal exception: Bad options: Filter must be specified in the form of [int, ... , int, BBB, XXX].",
+              );
+              return out.join("\n");
+            }
           }
 
           var emptyOpts = [];
@@ -6519,21 +7418,23 @@
 
           var fuzzTarget =
             st.url +
+            (st.on.b ? " " + st.val.b : "") +
             (st.on.d ? " " + st.val.d : "") +
             (st.on.X ? " " + st.val.X : "") +
-            (st.on.H ? " " + st.val.H : "");
+            (st.on.H ? " " + st.val.H : "") +
+            (st.on.basic ? " " + st.val.basic : "");
           var mBase1 = fuzzTarget.match(/FUZZ\{([^}]*)\}/);
           var mBase2 = fuzzTarget.match(/FUZ2Z\{([^}]*)\}/);
           var hasBaseline = !!(mBase1 || mBase2);
-          var usesBBB = ["hc", "hl", "hw", "hh", "sc", "sl", "sw", "sh"].some(
-            function (k) {
+          var usesBBB =
+            numFilterKeys.some(function (k) {
               return st.on[k] && nums(st.val[k]).indexOf("BBB") >= 0;
-            },
-          );
+            }) ||
+            (st.on.flt && /\bBBB\b/i.test(String(st.val.flt || "")));
           if (usesBBB && !hasBaseline) {
             add(
-              "ln-warn",
-              "Fatal exception: Bad options: specify a baseline value (e.g. FUZZ{test}) when using BBB.",
+              "ln-err",
+              "Fatal exception: Bad options: specify a baseline value when using BBB",
             );
             return out.join("\n");
           }
@@ -6542,80 +7443,204 @@
           var hasFuzz2 = /FUZ2Z(?:\{[^}]*\})?/.test(fuzzTarget);
           if (!hasFuzz1)
             notes.push(
-              "No FUZZ marker found in URL, POST data, method, or headers. The first payload is not placed anywhere.",
+              "No FUZZ marker found in URL, cookie, POST data, method, headers, or --basic. The first payload is not placed anywhere.",
             );
 
           var mode = st.on.m
-            ? String(st.val.m || "product")
+            ? String(st.val.m || "")
                 .trim()
                 .toLowerCase()
             : "product";
+          if (mode !== "product" && mode !== "zip" && mode !== "chain") {
+            add(
+              "ln-err",
+              "Fatal exception: Unexistent iterator '" +
+                (st.val.m || "") +
+                "'. Valid iterators: product, zip, chain.",
+            );
+            return out.join("\n");
+          }
+          if (zSpecs.length > 2 && mode !== "chain") {
+            add(
+              "ln-err",
+              "Fatal exception: FUZZ words and number of payloads do not match!",
+            );
+            return out.join("\n");
+          }
           if (hasFuzz2 && (zSpecs.length < 2 || mode === "chain")) {
             add(
-              "ln-warn",
-              "Fatal exception: FUZ2Z requires two active -z payloads with a pairing iterator (product or zip), not a single stream.",
+              "ln-err",
+              "Fatal exception: FUZZ words and number of payloads do not match!",
             );
             return out.join("\n");
           }
           if (zSpecs.length === 2 && !hasFuzz2 && mode !== "chain") {
             add(
-              "ln-warn",
-              "Fatal exception: Too many payloads specified for the available FUZZ keywords (add FUZ2Z or use -m chain).",
+              "ln-err",
+              "Fatal exception: FUZZ words and number of payloads do not match!",
             );
             return out.join("\n");
           }
 
-          var zA = listFromZ(zSpecs[0]);
-          var zB = zSpecs.length > 1 ? listFromZ(zSpecs[1]) : null;
-          if (zA.unknownFile || (zB && zB.unknownFile)) {
-            var miss = [zA.unknownFile, zB && zB.unknownFile]
-              .filter(Boolean)
-              .join(", ");
+          var zLists = zSpecs.map(listFromZ);
+          var missingFiles = zLists
+            .map(function (z) {
+              return z.unknownFile;
+            })
+            .filter(Boolean);
+          if (missingFiles.length) {
             add(
-              "ln-warn",
+              "ln-err",
               "Fatal exception: File '" +
-                miss +
-                "' is not bundled in this offline simulator (use userlist.txt or passlist.txt).",
+                missingFiles.join(", ") +
+                "' is not bundled in this offline simulator (use userlist.txt, passlist.txt, or sessid_fuzz.txt).",
             );
             return out.join("\n");
           }
-          var encActive = !!(
-            (zA.encoder && !/^(none|urlencode)$/i.test(zA.encoder)) ||
-            (zB && zB.encoder && !/^(none|urlencode)$/i.test(zB.encoder))
-          );
-          if (zA.encoder || (zB && zB.encoder)) {
-            var encs = [zA.encoder, zB && zB.encoder]
-              .filter(Boolean)
-              .join(", ");
+
+          var encUnknowns = [];
+          var encodedLists = zLists.map(function (z) {
+            var list = z.items.map(function (it) {
+              var r = applyWfEncoder(it, z.encoder);
+              if (r.unknown && encUnknowns.indexOf(r.unknown) < 0)
+                encUnknowns.push(r.unknown);
+              return r.value;
+            });
+            return { items: list, encoder: z.encoder };
+          });
+          if (encUnknowns.length) {
             notes.push(
-              "Encoder (" +
-                encs +
-                ") applied in -z; encoded credentials will not match DVWA plaintext login.",
+              "Encoder(s) '" +
+                encUnknowns.join(", ") +
+                "' not simulated offline; values left unencoded and won't match plaintext login.",
             );
           }
 
           var combos = [];
-          if (zB && mode === "chain") {
-            zA.items.concat(zB.items).forEach(function (x) {
-              combos.push([x, null]);
+          if (mode === "chain") {
+            encodedLists.forEach(function (z) {
+              z.items.forEach(function (x) {
+                combos.push([x, null, z.encoder, ""]);
+              });
             });
-          } else if (zB && mode === "zip") {
-            var n = Math.min(zA.items.length, zB.items.length);
-            for (var i = 0; i < n; i++) combos.push([zA.items[i], zB.items[i]]);
-          } else if (zB) {
-            if (mode !== "product")
-              notes.push(
-                "Unsupported iterator '" + mode + "'; falling back to product.",
-              );
-            zA.items.forEach(function (a) {
-              zB.items.forEach(function (b) {
-                combos.push([a, b]);
+          } else if (encodedLists.length === 2 && mode === "zip") {
+            var n = Math.min(
+              encodedLists[0].items.length,
+              encodedLists[1].items.length,
+            );
+            for (var i = 0; i < n; i++) {
+              combos.push([
+                encodedLists[0].items[i],
+                encodedLists[1].items[i],
+                encodedLists[0].encoder,
+                encodedLists[1].encoder,
+              ]);
+            }
+          } else if (encodedLists.length === 2) {
+            encodedLists[0].items.forEach(function (a) {
+              encodedLists[1].items.forEach(function (b) {
+                combos.push([
+                  a,
+                  b,
+                  encodedLists[0].encoder,
+                  encodedLists[1].encoder,
+                ]);
               });
             });
           } else {
-            zA.items.forEach(function (a) {
-              combos.push([a, null]);
+            encodedLists[0].items.forEach(function (a) {
+              combos.push([a, null, encodedLists[0].encoder, ""]);
             });
+          }
+
+          var urlMeta = st.url.match(/^(https?):\/\/([^/:?#]+)(?::(\d+))?/i);
+          var urlScheme = urlMeta ? urlMeta[1].toLowerCase() : "http";
+          var urlHost = urlMeta ? urlMeta[2].toLowerCase() : "";
+          var urlPort = urlMeta
+            ? urlMeta[3] || (urlScheme === "https" ? "443" : "80")
+            : "80";
+          var isLocalHost = urlHost === "127.0.0.1" || urlHost === "localhost";
+          var urlPathRaw = (st.url.match(/^https?:\/\/[^/?#]+([^?#]*)/i) || [
+            "",
+            "",
+          ])[1];
+          var isDvwaPath = /^\/vulnerabilities(?:\/|$)/i.test(urlPathRaw);
+          var isCustomTarget =
+            !isLocalHost || (urlPort !== "42001" && !isDvwaPath);
+          var cleanTargetUrl = st.url.replace(
+            /(FUZ(?:[2-9]|[1-9]\d+)?Z)\{[^}]*\}/g,
+            "$1",
+          );
+          var star = "********************************************************";
+          var title =
+            "* Wfuzz 3.1.0 - The Web Fuzzer                         *";
+          var bar =
+            "=====================================================================";
+          var head =
+            "ID           Response   Lines    Word       Chars       Payload        ";
+
+          if (isCustomTarget) {
+            if (st.on.t && !(parseInt(st.val.t, 10) > 0))
+              notes.push(
+                "Invalid -t value; using default 10 concurrent connections.",
+              );
+            if (
+              st.on.s &&
+              (isNaN(parseFloat(st.val.s)) || parseFloat(st.val.s) < 0)
+            )
+              notes.push("Invalid -s delay; using 0s.");
+            add("ln-info", star);
+            add("ln-info", title);
+            add("ln-info", star);
+            add("ln-plain", "");
+            add("ln-info", "Target: " + cleanTargetUrl);
+            add("ln-info", "Total requests: " + combos.length);
+            add("ln-plain", "");
+            add(
+              "ln-ok",
+              "[READY] Command syntax is valid and ready to run in terminal.",
+            );
+            add(
+              "ln-info",
+              "[NOTE] Offline simulator only models local DVWA (127.0.0.1:42001).",
+            );
+            notes.forEach(function (msg) {
+              add("ln-warn", "[NOTE] " + msg);
+            });
+            return out.join("\n");
+          }
+
+          if (urlPort !== "42001" || urlScheme === "https") {
+            add("ln-info", star);
+            add("ln-info", title);
+            add("ln-info", star);
+            add("ln-plain", "");
+            add("ln-info", "Target: " + cleanTargetUrl);
+            add("ln-info", "Total requests: " + combos.length);
+            add("ln-plain", "");
+            add("ln-plain", bar);
+            add("ln-plain", head);
+            add(
+              "ln-err",
+              urlPort !== "42001"
+                ? "UserWarning: Fatal exception: Pycurl error 7: Failed to connect to " +
+                    urlHost +
+                    ":" +
+                    urlPort +
+                    " after 0 ms: Could not connect to server"
+                : "UserWarning: Fatal exception: Pycurl error 35: TLS connect error: error:0A00010B:SSL routines::wrong version number",
+            );
+            add("ln-plain", bar);
+            add("ln-plain", "");
+            add("ln-info", "Total time: 0");
+            add("ln-info", "Processed Requests: 0");
+            add("ln-info", "Filtered Requests: 0");
+            add("ln-info", "Requests/sec.: 0");
+            return out.join("\n");
+          }
+
+          function isValidSessId(id) {
+            return /^[a-z0-9,-]{20,64}$/i.test(id) && !/^0+$/.test(id);
           }
 
           var rawMethodSpec = st.on.X
@@ -6625,17 +7650,18 @@
               : "GET";
           var methodIsFuzzed = /FUZ\d*Z/.test(rawMethodSpec);
           var staticMethod = rawMethodSpec.toUpperCase();
-          var cookieStr = st.on.b ? String(st.val.b || "") : "";
-          if (!cookieStr && st.on.H) {
+          var rawCookieSpec = st.on.b ? String(st.val.b || "") : "";
+          if (!rawCookieSpec && st.on.H) {
             var hm = String(st.val.H || "").match(/Cookie\s*:\s*([^,\r\n]+)/i);
-            if (hm) cookieStr = hm[1].trim();
+            if (hm) rawCookieSpec = hm[1].trim();
           }
-          var level = st.level || "low";
-          if (cookieStr) {
-            var lm = cookieStr.match(/security\s*=\s*([A-Za-z]+)/i);
-            if (lm) level = lm[1].toLowerCase();
-          }
-          var cookieOk = /PHPSESSID\s*=\s*[^;\s]+/i.test(cookieStr);
+          var cookieIsFuzzed = /FUZ\d*Z/.test(rawCookieSpec);
+          var staticLvM = rawCookieSpec.match(
+            /security\s*=\s*(low|medium|high|impossible)\b/i,
+          );
+          var staticLevel = staticLvM ? staticLvM[1].toLowerCase() : "low";
+          var staticSidM = rawCookieSpec.match(/PHPSESSID\s*=\s*([^;\s]+)/i);
+          var staticCookieOk = !!(staticSidM && isValidSessId(staticSidM[1]));
 
           var staticPathM = st.url.match(/^https?:\/\/[^/?#]+([^?#]*)/i);
           var staticPath = staticPathM ? staticPathM[1] : st.url.split("?")[0];
@@ -6649,47 +7675,59 @@
                 "' is not /vulnerabilities/brute/. DVWA returns 404.",
             );
           }
-          if (!cookieStr)
+          if (!rawCookieSpec)
             notes.push(
               "No cookie (-b or -H Cookie). DVWA answers 302 and redirects to login.php.",
             );
-          else if (!cookieOk)
+          else if (!cookieIsFuzzed && !staticCookieOk)
             notes.push(
-              "Cookie does not contain a valid PHPSESSID. DVWA redirects to login.php.",
+              "Cookie PHPSESSID is missing or invalid (simulator requires a 20-64 char non-zero session ID). DVWA redirects to login.php.",
             );
           if (methodIsFuzzed)
             notes.push("Fuzzing HTTP method via -X " + rawMethodSpec + ".");
           else if (staticMethod === "HEAD")
             notes.push("-X HEAD returns headers only (0 L / 0 W / 0 Ch).");
-          if (cookieOk) {
+          if (staticCookieOk || cookieIsFuzzed) {
+            var isBrutePath =
+              staticPath.replace(/\/+$/, "") === "/vulnerabilities/brute";
             if (
-              !methodIsFuzzed &&
-              staticMethod === "POST" &&
-              (level === "low" || level === "medium" || level === "high")
-            )
+              isBrutePath &&
+              st.on.d &&
+              !/[?&]Login=/.test(st.url) &&
+              (staticLevel === "low" ||
+                staticLevel === "medium" ||
+                staticLevel === "high")
+            ) {
               notes.push(
                 "DVWA " +
-                  level +
-                  " brute-force expects GET, not POST (-d / -X POST).",
+                  staticLevel +
+                  " brute-force reads $_GET from the URL query string, not the -d POST body.",
               );
-            if (!/[?&]Login=/.test(st.url + (st.on.d ? "&" + st.val.d : ""))) {
+            } else if (
+              isBrutePath &&
+              !/[?&]Login=/.test(st.url + (st.on.d ? "&" + st.val.d : ""))
+            ) {
               notes.push(
                 "Login=Login parameter is missing; DVWA returns the bare form without checking credentials.",
               );
             }
-            if (level === "medium")
+            if (staticLevel === "medium")
               notes.push(
                 "security=medium: failed attempts sleep ~2s (serialized by PHPSESSID lock) and length is +9 chars (fail: 4445 Ch, admin hit: 4483 Ch).",
               );
-            if (level === "high")
+            if (staticLevel === "high")
               notes.push(
                 "security=high: user_token is missing, so GET requests with Login=Login redirect (302) and no Welcome page is returned.",
               );
-            if (level === "impossible")
+            if (staticLevel === "impossible")
               notes.push(
                 "security=impossible: requires POST with username, password, Login and fresh user_token, sleeps rand(2,4)s on failure, plus locks accounts for 15 minutes after 3 failures.",
               );
           }
+          if (st.on.basic)
+            notes.push(
+              "HTTP Basic Auth header (--basic) attached; DVWA brute-force uses session cookies, not Basic Auth.",
+            );
           if (st.on.p)
             notes.push(
               "Proxy " +
@@ -6709,19 +7747,31 @@
               "Results would also be stored with -f " + st.val.f + ".",
             );
 
-          var medDelta = level === "medium" ? 9 : 0;
           var dvwaPrefix =
             "Damn Vulnerable Web Application (DVWA) Brute Force ";
 
           function evalPair(pair, idx) {
             var raw1 = pair[0] == null ? "" : String(pair[0]);
             var raw2 = pair[1] == null ? "" : String(pair[1]);
-            var p1 = encodeURIComponent(raw1);
-            var p2 = encodeURIComponent(raw2);
+            var enc1 = pair[2] || "";
+            var enc2 = pair[3] || "";
+            var p1 = /urlencode/i.test(enc1) ? raw1 : encodeURIComponent(raw1);
+            var p2 = /urlencode/i.test(enc2) ? raw2 : encodeURIComponent(raw2);
             var reqMethod = rawMethodSpec
               .replace(/FUZZ(?:\{[^}]*\})?/g, raw1)
               .replace(/FUZ2Z(?:\{[^}]*\})?/g, raw2)
               .toUpperCase();
+            var reqCookie = rawCookieSpec
+              .replace(/FUZZ(?:\{[^}]*\})?/g, raw1)
+              .replace(/FUZ2Z(?:\{[^}]*\})?/g, raw2);
+            var sidM = reqCookie.match(/PHPSESSID\s*=\s*([^;\s]+)/i);
+            var cookieOk = !!(sidM && isValidSessId(sidM[1]));
+            var lvM = reqCookie.match(
+              /security\s*=\s*(low|medium|high|impossible)\b/i,
+            );
+            var level = lvM ? lvM[1].toLowerCase() : "low";
+            var medDelta = level === "medium" ? 9 : 0;
+
             var url = st.url
               .replace(/FUZZ(?:\{[^}]*\})?/g, p1)
               .replace(/FUZ2Z(?:\{[^}]*\})?/g, p2);
@@ -6736,16 +7786,21 @@
               "",
             );
             var pathOk = reqPath === "/vulnerabilities/brute";
-            var srcParams = reqMethod === "POST" ? "?" + post : url;
-            var um = srcParams.match(/[?&]username=([^&]*)/);
-            var pm = srcParams.match(/[?&]password=([^&]*)/);
-            var hasLogin = /[?&]Login=/.test(srcParams);
-            var user = um ? um[1] : "";
-            var pass = pm ? pm[1] : "";
+
+            var getUm = url.match(/[?&]username=([^&]*)/);
+            var getPm = url.match(/[?&]password=([^&]*)/);
+            var hasGetLogin = /[?&]Login=/.test(url);
+            var getUser = getUm ? getUm[1] : "";
+            var getPass = getPm ? getPm[1] : "";
             try {
-              user = decodeURIComponent(user);
-              pass = decodeURIComponent(pass);
+              getUser = decodeURIComponent(getUser);
+              getPass = decodeURIComponent(getPass);
             } catch (e) {}
+
+            var postQs = "?" + post;
+            var hasPostUser = /[?&]username=/.test(postQs);
+            var hasPostPass = /[?&]password=/.test(postQs);
+            var hasPostLogin = /[?&]Login=/.test(postQs);
 
             var row;
             if (!/^(GET|POST|HEAD|OPTIONS|PUT|DELETE|PATCH)$/.test(reqMethod)) {
@@ -6755,6 +7810,24 @@
                 words: 36,
                 chars: 292,
                 body: "501 Not Implemented",
+                ok: false,
+              };
+            } else if (reqPath === "/vulnerabilities/sqli" && cookieOk) {
+              row = {
+                code: 200,
+                lines: 109,
+                words: 248,
+                chars: 4293,
+                body: "DVWA SQL Injection",
+                ok: false,
+              };
+            } else if (reqPath === "/vulnerabilities/xss_r" && cookieOk) {
+              row = {
+                code: 200,
+                lines: 110,
+                words: 257,
+                chars: 4449,
+                body: "DVWA XSS Reflected",
                 ok: false,
               };
             } else if (!pathOk) {
@@ -6770,14 +7843,14 @@
                     }
                   : {
                       code: 404,
-                      lines: 9,
-                      words: 34,
-                      chars: 274,
+                      lines: 7,
+                      words: 11,
+                      chars: 153,
                       body: "404 Not Found",
                       ok: false,
                     };
             } else if (reqMethod === "HEAD") {
-              var headRedir = !cookieOk || (level === "high" && hasLogin);
+              var headRedir = !cookieOk || (level === "high" && hasGetLogin);
               row = {
                 code: headRedir ? (st.on.L ? 200 : 302) : 200,
                 lines: 0,
@@ -6790,9 +7863,9 @@
               row = st.on.L
                 ? {
                     code: 200,
-                    lines: 35,
-                    words: 72,
-                    chars: 1520,
+                    lines: 74,
+                    words: 116,
+                    chars: 1342,
                     body: "Damn Vulnerable Web Application (DVWA) - Login",
                     ok: false,
                   }
@@ -6804,22 +7877,13 @@
                     body: "",
                     ok: false,
                   };
-            } else if (reqMethod !== "GET" && reqMethod !== "POST") {
-              row = {
-                code: 405,
-                lines: 9,
-                words: 32,
-                chars: 268,
-                body: "405 Method Not Allowed",
-                ok: false,
-              };
             } else if (level === "high") {
-              if (reqMethod !== "GET" || !hasLogin) {
+              if (!hasGetLogin) {
                 row = {
                   code: 200,
-                  lines: 109,
-                  words: 253,
-                  chars: 4380,
+                  lines: 111,
+                  words: 258,
+                  chars: 4472,
                   body: dvwaPrefix + "form",
                   ok: false,
                 };
@@ -6828,8 +7892,8 @@
                   ? {
                       code: 200,
                       lines: 111,
-                      words: 254,
-                      chars: 4380,
+                      words: 258,
+                      chars: 4472,
                       body: dvwaPrefix + "CSRF token is incorrect",
                       ok: false,
                     }
@@ -6843,12 +7907,17 @@
                     };
               }
             } else if (level === "impossible") {
-              if (reqMethod !== "POST" || !hasLogin || !um || !pm) {
+              if (
+                reqMethod !== "POST" ||
+                !hasPostLogin ||
+                !hasPostUser ||
+                !hasPostPass
+              ) {
                 row = {
                   code: 200,
-                  lines: 109,
-                  words: 253,
-                  chars: 4380,
+                  lines: 111,
+                  words: 258,
+                  chars: 4491,
                   body: dvwaPrefix + "form",
                   ok: false,
                 };
@@ -6857,8 +7926,8 @@
                   ? {
                       code: 200,
                       lines: 111,
-                      words: 254,
-                      chars: 4380,
+                      words: 258,
+                      chars: 4491,
                       body: dvwaPrefix + "CSRF token is incorrect",
                       ok: false,
                     }
@@ -6871,23 +7940,25 @@
                       ok: false,
                     };
               }
-            } else if (reqMethod !== "GET" || !hasLogin) {
+            } else if (!hasGetLogin) {
               row = {
                 code: 200,
-                lines: 109,
+                lines: 111,
                 words: 253,
-                chars: 4380 + medDelta,
+                chars: 4384 + medDelta,
                 body: dvwaPrefix + "form",
                 ok: false,
               };
-            } else if (!encActive && CREDS[user] === pass) {
+            } else if (!encUnknowns.length && CREDS[getUser] === getPass) {
               row = {
                 code: 200,
                 lines: 111,
                 words: 262,
-                chars: (HIT_CHARS[user] || 4474) + medDelta,
+                chars: (HIT_CHARS[getUser] || 4474) + medDelta,
                 body:
-                  dvwaPrefix + "Welcome to the password protected area " + user,
+                  dvwaPrefix +
+                  "Welcome to the password protected area " +
+                  getUser,
                 ok: true,
               };
             } else {
@@ -6907,11 +7978,15 @@
           }
 
           var base = hasBaseline
-            ? evalPair([mBase1 ? mBase1[1] : "", mBase2 ? mBase2[1] : null], 0)
+            ? evalPair(
+                [mBase1 ? mBase1[1] : "", mBase2 ? mBase2[1] : null, "", ""],
+                1,
+              )
             : { code: 0, lines: 0, words: 0, chars: 0, body: "" };
 
+          var idOffset = hasBaseline ? 2 : 1;
           var rows = combos.map(function (pair, idx) {
-            return evalPair(pair, idx + 1);
+            return evalPair(pair, idx + idOffset);
           });
 
           function matchNum(n, spec, baseline) {
@@ -6920,19 +7995,11 @@
               return x === String(n);
             });
           }
-          function rxTest(body, spec) {
-            if (!spec) return false;
-            try {
-              return new RegExp(spec).test(body);
-            } catch (e) {
-              return String(body).indexOf(spec) >= 0;
-            }
-          }
 
           var hiddenN = 0;
           var shown = rows.filter(function (r) {
             var hide = false;
-            if (st.on.hs && rxTest(r.body, st.val.hs)) hide = true;
+            if (hsRegex && hsRegex.test(r.body)) hide = true;
             if (st.on.hw && matchNum(r.words, st.val.hw, base.words))
               hide = true;
             if (st.on.hh && matchNum(r.chars, st.val.hh, base.chars))
@@ -6944,23 +8011,29 @@
               hiddenN++;
               return false;
             }
-            var shows = [];
-            if (st.on.ss) shows.push(rxTest(r.body, st.val.ss));
-            if (st.on.sw) shows.push(matchNum(r.words, st.val.sw, base.words));
-            if (st.on.sh) shows.push(matchNum(r.chars, st.val.sh, base.chars));
-            if (st.on.sc) shows.push(matchNum(r.code, st.val.sc, base.code));
-            if (st.on.sl) shows.push(matchNum(r.lines, st.val.sl, base.lines));
-            if (
-              shows.length &&
-              shows.some(function (x) {
-                return !x;
-              })
-            ) {
+            var numShows = [];
+            if (st.on.sw)
+              numShows.push(matchNum(r.words, st.val.sw, base.words));
+            if (st.on.sh)
+              numShows.push(matchNum(r.chars, st.val.sh, base.chars));
+            if (st.on.sc) numShows.push(matchNum(r.code, st.val.sc, base.code));
+            if (st.on.sl)
+              numShows.push(matchNum(r.lines, st.val.sl, base.lines));
+            if (numShows.length && !numShows.some(Boolean)) {
+              hiddenN++;
+              return false;
+            }
+            if (ssRegex && !ssRegex.test(r.body)) {
+              hiddenN++;
+              return false;
+            }
+            if (fltCompiled && !fltCompiled.fn(r, base)) {
               hiddenN++;
               return false;
             }
             return true;
           });
+          if (hasBaseline) shown.unshift(base);
 
           var threads = 10;
           if (st.on.t) {
@@ -6977,29 +8050,32 @@
             if (!isNaN(dv) && dv >= 0) delay = dv;
             else notes.push("Invalid -s delay; using 0s.");
           }
+          var delayWarn = st.on.s && delay > 0 && st.on.t;
+          if (delay > 0) threads = 1;
+
+          var processedCount = rows.length + (hasBaseline ? 1 : 0);
           var delayedCount = rows.filter(function (r) {
             return r.delayed;
           }).length;
-          var normalCount = rows.length - delayedCount;
-          var time = rows.length
+          var normalCount = processedCount - delayedCount;
+          var time = processedCount
             ? Math.ceil(normalCount / threads) * 0.023 +
               normalCount * delay +
               delayedCount * (2 + delay)
             : 0;
-          var rate = time > 0 ? rows.length / time : 0;
+          var rate = time > 0 ? processedCount / time : 0;
 
-          var star = "********************************************************";
-          var title =
-            "* Wfuzz 3.1.0 - The Web Fuzzer                         *";
-          var bar =
-            "=====================================================================";
-          var head =
-            "ID           Response   Lines    Word       Chars       Payload        ";
+          if (delayWarn) {
+            add(
+              "ln-warn",
+              "UserWarning: When using delayed requests concurrent requests are limited to 1, therefore the -t switch will be ignored.",
+            );
+          }
           add("ln-info", star);
           add("ln-info", title);
           add("ln-info", star);
           add("ln-plain", "");
-          add("ln-info", "Target: " + st.url);
+          add("ln-info", "Target: " + cleanTargetUrl);
           add("ln-info", "Total requests: " + rows.length);
           add("ln-plain", "");
           add("ln-plain", bar);
@@ -7045,7 +8121,7 @@
             "ln-info",
             "Total time: " + (time < 0.0005 ? "0" : time.toFixed(6)),
           );
-          add("ln-info", "Processed Requests: " + rows.length);
+          add("ln-info", "Processed Requests: " + processedCount);
           add("ln-info", "Filtered Requests: " + hiddenN);
           add("ln-info", "Requests/sec.: " + (rate ? rate.toFixed(4) : "0"));
           notes.forEach(function (msg) {
@@ -7242,6 +8318,19 @@
           })
           .filter(Boolean);
         var tocEl = document.querySelector(".toc");
+        if (tocEl) {
+          tocEl.addEventListener(
+            "wheel",
+            function (e) {
+              if (tocEl.scrollWidth <= tocEl.clientWidth) return;
+              if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                tocEl.scrollLeft -= e.deltaY;
+              }
+            },
+            { passive: false },
+          );
+        }
         var currentActiveId = "";
         function setActiveNav(id) {
           if (id === currentActiveId) return;
@@ -7260,6 +8349,15 @@
             }
           });
         }
+
+        var topbarEl = document.querySelector(".topbar");
+        function syncNavHeight() {
+          if (!topbarEl) return;
+          var h = Math.ceil(topbarEl.getBoundingClientRect().height);
+          if (h > 0)
+            document.documentElement.style.setProperty("--nav-h", h + "px");
+        }
+        syncNavHeight();
 
         var bar = document.getElementById("progress-bar");
         var spyTicking = false;
@@ -7282,9 +8380,10 @@
             setActiveNav(lastSec.id);
             return;
           }
+          var navOffset = (topbarEl ? topbarEl.offsetHeight : 66) + 56;
           var activeId = sections[0].id;
           for (var i = 0; i < sections.length; i++) {
-            if (sections[i].getBoundingClientRect().top <= 130) {
+            if (sections[i].getBoundingClientRect().top <= navOffset) {
               activeId = sections[i].id;
             }
           }
@@ -7297,7 +8396,14 @@
           }
         }
         window.addEventListener("scroll", requestScrollUI, { passive: true });
-        window.addEventListener("resize", requestScrollUI, { passive: true });
+        window.addEventListener(
+          "resize",
+          function () {
+            syncNavHeight();
+            requestScrollUI();
+          },
+          { passive: true },
+        );
         updateScrollUI();
 
         var themeBtn = document.getElementById("theme-toggle");
@@ -7352,18 +8458,15 @@
           });
         });
 
+        var specDrawers = [];
         document.querySelectorAll(".spec").forEach(function (grid) {
           if (grid.closest(".spec-drawer")) return;
-          var cards = Array.prototype.slice
+          var allCards = Array.prototype.slice
             .call(grid.children)
             .filter(function (el) {
               return el.tagName === "ARTICLE";
             });
-          if (cards.length <= 4) return;
-
-          var extra = cards.slice(4);
-          var extraCount = extra.length.toLocaleString("fa-IR");
-          grid.classList.add("spec-has-more");
+          if (allCards.length <= 2) return;
 
           var drawer = document.createElement("div");
           drawer.className = "spec-drawer";
@@ -7375,10 +8478,6 @@
 
           var extraGrid = document.createElement("div");
           extraGrid.className = "spec";
-          extra.forEach(function (card) {
-            extraGrid.appendChild(card);
-          });
-
           inner.appendChild(extraGrid);
           drawer.appendChild(inner);
 
@@ -7390,24 +8489,119 @@
           btn.className = "btn light sm spec-more-btn";
           btn.setAttribute("aria-expanded", "false");
           btn.innerHTML =
-            "<span>نمایش " +
-            extraCount +
-            ' مورد بیشتر</span><span class="chev" aria-hidden="true">▾</span>';
+            '<span></span><span class="chev" aria-hidden="true">▾</span>';
 
           btn.addEventListener("click", function () {
+            cancelAnimationFrame(drawer._scrollRaf);
+            var wasOpen = drawer.classList.contains("open");
+            var anchorEl = grid.previousElementSibling || grid;
+            var topEl = document.querySelector(".topbar");
+            var navH = (topEl ? topEl.offsetHeight : 66) + 18;
+            var startBtnTop = btnWrap.getBoundingClientRect().top;
+            var needTrack =
+              wasOpen && anchorEl.getBoundingClientRect().top < navH;
+
             var open = drawer.classList.toggle("open");
             btn.setAttribute("aria-expanded", open ? "true" : "false");
             drawer.setAttribute("aria-hidden", open ? "false" : "true");
             if ("inert" in drawer) drawer.inert = !open;
             btn.querySelector("span").textContent = open
               ? "بستن موارد اضافه"
-              : "نمایش " + extraCount + " مورد بیشتر";
+              : btn.dataset.moreLabel || "نمایش موارد بیشتر";
+
+            if (needTrack) {
+              var htmlEl = document.documentElement;
+              var startedAt = performance.now();
+              function trackClose() {
+                if (drawer.classList.contains("open")) return;
+                var curBtnTop = btnWrap.getBoundingClientRect().top;
+                var diff = startBtnTop - curBtnTop;
+                var room = navH - anchorEl.getBoundingClientRect().top;
+                if (diff > 0.5 && room > 0.5) {
+                  var adjust = Math.min(diff, room);
+                  var prevBeh = htmlEl.style.scrollBehavior;
+                  htmlEl.style.scrollBehavior = "auto";
+                  window.scrollTo(0, Math.max(0, window.scrollY - adjust));
+                  htmlEl.style.scrollBehavior = prevBeh;
+                }
+                var h = drawer.getBoundingClientRect().height;
+                if (h > 0.5 && performance.now() - startedAt < 450) {
+                  drawer._scrollRaf = requestAnimationFrame(trackClose);
+                } else {
+                  var finalAnchorTop = anchorEl.getBoundingClientRect().top;
+                  if (finalAnchorTop < navH) {
+                    window.scrollTo({
+                      top: Math.max(0, window.scrollY + finalAnchorTop - navH),
+                      behavior: "smooth",
+                    });
+                  }
+                }
+              }
+              drawer._scrollRaf = requestAnimationFrame(trackClose);
+            }
           });
 
           btnWrap.appendChild(btn);
           grid.insertAdjacentElement("afterend", drawer);
           drawer.insertAdjacentElement("afterend", btnWrap);
+
+          specDrawers.push({
+            grid: grid,
+            extraGrid: extraGrid,
+            drawer: drawer,
+            btnWrap: btnWrap,
+            btn: btn,
+            allCards: allCards,
+            lastLimit: 0,
+          });
         });
+
+        function getSpecVisibleCount(grid) {
+          if (!grid.clientWidth) return 4;
+          var tpl = (getComputedStyle(grid).gridTemplateColumns || "").trim();
+          var cols = tpl ? tpl.split(/\s+/).length : 1;
+          if (cols <= 2) return 2;
+          if (cols >= 5) return 5;
+          return cols;
+        }
+
+        function updateSpecDrawers() {
+          specDrawers.forEach(function (item) {
+            var limit = getSpecVisibleCount(item.grid);
+            if (item.lastLimit === limit) return;
+            item.lastLimit = limit;
+
+            var visible = item.allCards.slice(0, limit);
+            var extra = item.allCards.slice(limit);
+
+            visible.forEach(function (card) {
+              item.grid.appendChild(card);
+            });
+            extra.forEach(function (card) {
+              item.extraGrid.appendChild(card);
+            });
+
+            var hasExtra = extra.length > 0;
+            item.grid.classList.toggle("spec-has-more", hasExtra);
+            item.drawer.hidden = !hasExtra;
+            item.btnWrap.hidden = !hasExtra;
+
+            if (!hasExtra) {
+              item.drawer.classList.remove("open");
+              item.drawer.setAttribute("aria-hidden", "true");
+              if ("inert" in item.drawer) item.drawer.inert = true;
+              item.btn.setAttribute("aria-expanded", "false");
+            } else {
+              var extraCount = extra.length.toLocaleString("fa-IR");
+              item.btn.dataset.moreLabel =
+                "نمایش " + extraCount + " مورد بیشتر";
+              var isOpen = item.drawer.classList.contains("open");
+              item.btn.querySelector("span").textContent = isOpen
+                ? "بستن موارد اضافه"
+                : item.btn.dataset.moreLabel;
+            }
+          });
+        }
 
         function syncSpecHeights() {
           document.querySelectorAll(".spec").forEach(function (grid) {
@@ -7451,6 +8645,8 @@
             });
           });
         }
+
+        updateSpecDrawers();
         syncSpecHeights();
         var syncSpecRaf = false;
         var lastSpecW = window.innerWidth;
@@ -7463,22 +8659,39 @@
             syncSpecRaf = true;
             requestAnimationFrame(function () {
               syncSpecRaf = false;
+              updateSpecDrawers();
               syncSpecHeights();
+              syncNavHeight();
             });
           },
           { passive: true },
         );
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(syncSpecHeights);
+          document.fonts.ready.then(function () {
+            syncNavHeight();
+            updateSpecDrawers();
+            syncSpecHeights();
+          });
         }
 
         document.querySelectorAll(".levels .cardish").forEach(function (card) {
           card.setAttribute("tabindex", "0");
           card.setAttribute("role", "button");
           card.setAttribute("aria-expanded", "false");
+          var cue = document.createElement("div");
+          cue.className = "level-cue";
+          cue.setAttribute("aria-hidden", "true");
+          cue.innerHTML =
+            '<span>مشاهده توضیحات</span><span class="chev">▾</span>';
+          var p = card.querySelector("p");
+          if (p) card.insertBefore(cue, p);
+          else card.appendChild(cue);
           function toggleCard() {
             var open = card.classList.toggle("open");
             card.setAttribute("aria-expanded", open ? "true" : "false");
+            cue.querySelector("span").textContent = open
+              ? "بستن توضیحات"
+              : "مشاهده توضیحات";
           }
           card.addEventListener("click", toggleCard);
           card.addEventListener("keydown", function (e) {
